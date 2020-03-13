@@ -20,7 +20,7 @@ from timeit import default_timer as timer
 import click
 import pandas as pd
 
-from spiralsort import io, spiralsort_post
+from spiralsort import io
 from spiralsort.core import spiralsort
 
 
@@ -53,10 +53,12 @@ def main(file_path,
 
     if save_animation:
         try:
+            from spiralsort import spiralsort_post
             click.echo("Creating the animation. This will take a while...")
             spiralsort_post.save_animation(sorted_nodes, file_path)
-        except ValueError:
-            raise Exception("ffmpeg is not installed. Exiting...")
+        except ModuleNotFoundError:
+            raise Exception("Check if matplotlib and ffmpeg are installed."
+                            " Exiting...")
 
 if __name__ == "__main__":
     main()

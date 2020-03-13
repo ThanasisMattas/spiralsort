@@ -8,8 +8,8 @@ A point-cloud spiral-sorting algorithm
 | --------------------- | --------------------- | --------- |
 | python3               | matplotlib >= 3.1.3   | GNU/Linux |
 | click>=7.0            | ffmpeg>=4.1.4         | Windows   |
-| numpy >= 1.18.0       |           |
-| pandas >= 1.0.1       |           |
+| numpy >= 1.18.0       |                       |           |
+| pandas >= 1.0.1       |                       |           |
 
 ## How to use
 
