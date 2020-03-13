@@ -90,9 +90,11 @@ described by the <br /> following steps:
 
 ## Options
 
---output-format (suported: csv, json, xlsx; defaults to the format of the input
+**--output-format=<format** **>** <br />
+(suported: csv, json, xlsx; defaults to the format of the input
                  file) <br />
---save-animation/--no-save-animation (defaults to false)
+**--save-animation/--no-save-animation** <br />
+(defaults to false)
 
 ## How to create an animation of the process
 
