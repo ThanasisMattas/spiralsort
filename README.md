@@ -2,7 +2,7 @@
 
 A point-cloud spiral-sorting algorithm
 
-<img src="bin/spiralsort_2D.gif" width="390" height="241" /> <img src="bin/spiralsort_3D.gif" width="390" height="241" />
+<img src="bin/spiralsort_2D.gif" width="420" height="260" /> <img src="bin/spiralsort_3D.gif" width="420" height="260" />
 
 | requirements          | optional              | os        |
 | --------------------- | --------------------- | --------- |
