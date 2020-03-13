@@ -15,7 +15,7 @@ General Public License along with this program. If not, see
 
 
 __name__ = 'spiralsort'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 __author__ = 'Thanasis Mattas'
 __author_email__ = 'atmattas@physics.auth.gr'
 __description__ = 'A point-cloud spiral-sorting algorithm'
