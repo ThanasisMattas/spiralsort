@@ -4,12 +4,12 @@ A point-cloud spiral-sorting algorithm
 
 <img src="bin/spiralsort_2D.gif" width="420" height="260" /> <img src="bin/spiralsort_3D.gif" width="420" height="260" />
 
-| requirements          | optional              | os        |
-| --------------------- | --------------------- | --------- |
-| python3               | matplotlib >= 3.1.3   | GNU/Linux |
-| click>=7.0            | ffmpeg>=4.1.4         | Windows   |
-| numpy >= 1.18.0       |                       |           |
-| pandas >= 1.0.1       |                       |           |
+| requirements        | optional              | os        |
+| ------------------- | --------------------- | --------- |
+| python3             | matplotlib>=3.1.3     | GNU/Linux |
+| click>=7.0          | ffmpeg>=4.1.4         | Windows   |
+| numpy>=1.18.0       |                       |           |
+| pandas>=1.0.1       |                       |           |
 
 ## How to use
 
