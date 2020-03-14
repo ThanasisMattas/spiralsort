@@ -22,6 +22,14 @@ import pandas as pd
 from spiralsort import config
 
 
+def check_duplicated_ids(nodes):
+    """check node_ids uniqueness"""
+    duplicated_ids = nodes[nodes.node_id.duplicated()].node_id.to_list()
+    if duplicated_ids:
+        raise Exception("node_id column has duplicated entries: {}"
+                        .format(duplicated_ids))
+
+
 def point_cloud_mock():
     """creates a mock point-cloud"""
     np.random.seed(2)

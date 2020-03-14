@@ -243,14 +243,6 @@ def spiral_stride(nodes,
     return nodes, node_ids, prev_node
 
 
-def check_duplicated_ids(nodes):
-    """check node_ids uniqueness"""
-    duplicated_ids = nodes[nodes.node_id.duplicated()].node_id.to_list()
-    if duplicated_ids:
-        raise Exception("node_id column has duplicated entries: {}"
-                        .format(duplicated_ids))
-
-
 def spiralsort(nodes, master_node_id):
     """spiral-sorting the node-cloud, starting from the master node
 
@@ -290,7 +282,7 @@ def spiralsort(nodes, master_node_id):
                                 the master node
     """
     # first, check if the node_ids are unique
-    check_duplicated_ids(nodes)
+    util.check_duplicated_ids(nodes)
 
     # final sequence of ids, used to sort the final dataframe,
     # initialized with the master node
