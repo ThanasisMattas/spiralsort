@@ -7,7 +7,8 @@ from spiralsort.core import spiralsort
 def main():
     # reed input
     input_file = os.path.join(os.getcwd(),
-                              "data_examples/point_cloud_example.csv")
+                              "data_examples",
+                              "point_cloud_example.csv")
     nodes = io.read_data_file(input_file)
 
     # say spiralsorting starts form the node with id "N_4004"
