@@ -51,7 +51,8 @@ supported formats: csv, json
 Starting from the *master_node* the algorithm evaluates a cost for each node and
 moves to the <br /> node with the minimum cost (cost for node<sup>i+1</sup> is
 the distance from node<sup>i</sup> plus the distance from <br /> the
-master_node).
+master_node). At each step, a counterclockwise filter is applied, in order to
+force a constant <br /> rotational direction.
 
 Optimizing the process, a methodology of slicing is applied on the point-cloud,
 described by the <br /> following steps:
