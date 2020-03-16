@@ -33,8 +33,8 @@ def distances_from_node(nodes, node):
     """evaluates the distances (norm I2) of nodes from node
 
     Args:
-        nodes (df)    :  has node_id, x, y, z columns
-        node (df)
+        nodes (df) :  the point-cloud
+        node (df)  :  the reference node
 
     Returns:
         distances (array)
@@ -50,11 +50,11 @@ def distances_from_node(nodes, node):
 def prev_node_gradient(prev_node):
     """returns the angle of the prev_node vector from the 0x axis
 
-    this is the angle that the point cloud will be rotated, in order to
+    this is the angle that the point-cloud will be rotated, in order to
     filter the counterclockwise side of the prev_node vector
 
     Args:
-        prev_node (df) :  columns: ["node_id", 'x', 'y', 'z', ...]
+        prev_node (df) :  the last sorted node
 
     Returns:
         theta (float)  :  the gradient of the prev_node in radians
@@ -86,11 +86,11 @@ def z_rotation(nodes, prev_node):
     theta < 0 : counterclockwise
 
     Args:
-        nodes (df)         :  the point cloud
+        nodes (df)     :  the point-cloud
         prev_node (df) :  the node that will fall on the 0x axis
 
     Returns:
-        rotated (df)       :  the point cloud after the rotation
+        rotated (df)   :  the point-cloud after the rotation
     """
     theta = prev_node_gradient(prev_node)
     rotated = nodes.copy()
@@ -100,12 +100,13 @@ def z_rotation(nodes, prev_node):
 
 
 def counterclockwise_filter(nodes, prev_node):
-    """The goal is to force the algorithm to rotate anti-clockwise.
-    Rotating the nodes, so that the vector of prev_node becomes the 0x
-    axis, we keep only nodes with positive y, to find the next node from.
+    """The goal is to force the algorithm to rotate counter-clockwise.
+    After rotating the nodes, so that the vector of prev_node becomes
+    the 0x axis, only nodes with positive y are kept, to find the next
+    node from.
 
     Args:
-        nodes (df)     :  the point cloud
+        nodes (df)     :  the point-cloud
         prev_node (df) :  the last popped node
 
     Returns:
@@ -123,10 +124,10 @@ def counterclockwise_filter(nodes, prev_node):
 
 
 def cost(nodes, prev_node):
-    """|node - master| + |node - prev_node|
+    """cost = |node - master| + |node - prev_node|
 
     Args:
-        nodes (df)         : the point cloud
+        nodes (df)         : the point-cloud
         prev_node (df)     : the node from which to calculate the cost
 
     Returns:
@@ -144,13 +145,13 @@ def cost_sort(nodes, prev_node, ignore_index=True):
     cost = |node - master| + |node - prev_node|
 
     Args:
-        nodes (df)          : the point cloud
+        nodes (df)          : the point-cloud
         prev_node (df)      : the node from which to calculate the cost
         ignore_index (bool) : whether to keep or reset the old index
                               (default True)
 
     Returns:
-        nodes (df)          : the point cloud, cost-sorted
+        nodes (df)          : the point-cloud, cost-sorted
     """
     with pd.option_context("mode.chained_assignment", None):
         nodes.loc[:, "cost"] = cost(nodes, prev_node)
@@ -160,19 +161,20 @@ def cost_sort(nodes, prev_node, ignore_index=True):
 
 
 def pop_next_node(nodes, prev_node):
-    """
+    """nodewise step of the algorithm
+
     1. evaluate cost
-    2. pop the next_node (the one with the min cost)
+    2. pop the node with the min cost
 
     Args:
-        nodes (df)          : the point cloud
+        nodes (df)          : the point-cloud
         prev_node (df)      : the last popped node
 
     Returns:
-        nodes (df)          : the point cloud, without the currently
+        nodes (df)          : the point-cloud, without the currently
                               popped node
-        next_node_id (str)
-        next_node (series)
+        next_node_id (str)  : to be appended to the node_ids list
+        next_node (series)  : the currently popped node
     """
     nodes_filtered = nodes.loc[counterclockwise_filter(nodes, prev_node)]
 
@@ -244,42 +246,49 @@ def spiral_stride(nodes,
 
 
 def spiralsort(nodes, master_node_id):
-    """spiral-sorting the node-cloud, starting from the master node
+    """spiralsorts the point-cloud, starting from the master_node
 
-    Spiral-sorting algorithm:
+    The SpiralSort algorithm:
     1. Sort the point cloud with respect to the distance from the master
-       node and segment it into slices.
-    2. Take the first slice (2000 nodes
+       node
+    2. Segment it into slices and take the first slice
     3. Take a SPIRAL_WINDOW (slice further)
-       Spiral windows for the 1st slice consist of 300 nodes, starting
+       Spiral windows for the 1st slice consist of 400 nodes, starting
        from the last sorted node (the master_node for the 1st window)
-    4. Iteretively pop 20 nodes (a stride), by the minimum cost.
+    4. Iteretively pop 15 nodes (a STRIDE), by the minimum cost. Namely,
+       a SPIRAL_WINDOW is sliced to spiralsort a STRIDE of nodes, before
+       moving to the next SPIRAL_WINDOW.
        (cost = |node - master_node| + |node - prev_node|)
-       Take the next SPIRAL_WINDOW and pop the next 10 nodes.
-       Continue until the remainder of the nodes reaches the size of the
+       At each iterative step, a filter is applied, keeping only nodes
+       from the counterclockwise side of the vector that starts from the
+       master node and ends at the previous node, in order to force the
+       algorithm to move on a constant rotating direction.
+    5. Take the next SPIRAL_WINDOW and pop the next STRIDE.
+    6. Continue until the remainder of the nodes reaches the size of the
        half slice (1000 nodes for the 1st slice).
-    5. Merge the remaining nodes with the next slice
-       (This overlap of the slices ensures that there is a continuity
-        while selecting the next nodes when the algorithm reaches the
-        last nodes of the slice)
-    6. For the next slices, a filter is applied, which keeps only nodes
-       from the counterclockwise side of the vector starting from the
-       master node and ending at the previous node,in order to force the
-       algorithm to move to a constant rotation direction
-    7. Keep moving by SPIRAL_WINDOWs (or strides), counterclockwise
-       filtering at each stride, popping 10s of nodes until the half
-       slice thresshold
-    8. Upon reaching the last slice, remove the half_slice threshold, to
-       pop all the remaining nodes.
+    7. Merge the remaining nodes with the next slice
+       This overlap of the slices ensures that there is a continuity
+       while selecting the next nodes, when the algorithm reaches the
+       last nodes of the slice.
+    8. For the next slices, while moving away from the master_node, the
+       SPIRAL_WINDOW is selected differently. Specifically, before each
+       STRIDE, the counterclockwise filter is applied, then the
+       remaining nodes are cost-sorted (with respect to their cost) from
+       the last spiralsorted node and, finally, a SPIRAL_WINDOW is
+       sliced, to start the iterative spiralsorting of the nodes in the
+       next STRIDE.
+    9. Keep moving by SPIRAL_WINDOWs, counterclockwise
+       filtering at each stride, popping STRIDEs of nodes until the half
+       slice thresshold.
+    10. Upon reaching the last slice, remove the *half_slice* threshold,
+       to pop all the remaining nodes.
 
     Args:
-        nodes (df)           :  the box_nodes (without the bar_nodes)
-        master_node_id (str) :  the node on the box surface where the
-                                 deformation starts
+        nodes (df)           :  the point-cloud
+        master_node_id (str) :  the node where spiralsorting starts
 
     Returns:
-        nodes_sorted (df)    :  the nodes spiral-sorted, starting from
-                                the master node
+        nodes_sorted (df)    :  the spiralsorted point-cloud
     """
     # first, check if the node_ids are unique
     util.check_duplicated_ids(nodes)
