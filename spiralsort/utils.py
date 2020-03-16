@@ -1,6 +1,6 @@
 """
 info:
-    file        :  utilities.py
+    file        :  utils.py
     author      :  Thanasis Mattas
     license     :  GNU General Public License v3
     description :  Houses everything that has no obvious homeland

@@ -21,7 +21,7 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from spiralsort import config, io, utilities as util, core
+from spiralsort import config, core, io, utils
 
 
 def quick_scatter(x, y, z):
@@ -143,7 +143,7 @@ def plot_spiralsort(nodes_sorted, master_node_id, output_dir):
     #     [0, 2000], [2000, 6000], [6000, 14000], [14000, 30000],
     #     [30000, 62000], [62000, 94000], [94000, 126000], ...
     # ]
-    slices = util.create_slices(nodes_sorted)
+    slices = utils.create_slices(nodes_sorted)
 
     # nodes are distance-sorted from the master_node, but the indexes
     # are not sorted
@@ -175,7 +175,7 @@ def plot_spiralsort(nodes_sorted, master_node_id, output_dir):
 
         new_slice_just_been_merged = True
         spiral_window = SPIRAL_WINDOW + slice_index * 100
-        half_slice = util.calc_half_slice(slicing_obj)
+        half_slice = utils.calc_half_slice(slicing_obj)
         slice_last_node_idx = slicing_obj.indices(int(1e100))[1]
 
         # nodes_next_slices

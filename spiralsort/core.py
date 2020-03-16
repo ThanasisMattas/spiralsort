@@ -17,7 +17,7 @@ General Public License along with this program. If not, see
 import numpy as np
 import pandas as pd
 
-from spiralsort import utilities as util
+from spiralsort import utils
 
 
 def master_offset(nodes, master_node_id):
@@ -291,7 +291,7 @@ def spiralsort(nodes, master_node_id):
         nodes_sorted (df)    :  the spiralsorted point-cloud
     """
     # first, check if the node_ids are unique
-    util.check_duplicated_ids(nodes)
+    utils.check_duplicated_ids(nodes)
 
     # final sequence of ids, used to sort the final dataframe,
     # initialized with the master node
@@ -319,7 +319,7 @@ def spiralsort(nodes, master_node_id):
     #     [0, 2000], [2000, 6000], [6000, 14000], [14000, 30000],
     #     [30000, 62000], [62000, 94000], [94000, 126000], ...
     # ]
-    slices = util.create_slices(nodes)
+    slices = utils.create_slices(nodes)
 
     # number of nodes anti-clockwise filtered and cost_sorted from prev
     # node, in order to iteretively pop the next nodes in the STRIDE
@@ -343,7 +343,7 @@ def spiralsort(nodes, master_node_id):
         # in the current slice.)
         remaining_nodes = pd.concat([remaining_nodes, nodes[slicing_obj]])
 
-        half_slice = util.calc_half_slice(slicing_obj)
+        half_slice = utils.calc_half_slice(slicing_obj)
 
         # leave half_slice remaining nodes to merge with the next slice
         # except from the last slice
