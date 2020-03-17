@@ -349,11 +349,11 @@ def spiralsort(nodes_input, master_node_id):
         # leave half_slice remaining nodes to merge with the next slice
         # except from the last slice
         if (slicing_obj in slices[: -1]) and (len(slices) > 1):
-            spiral_iters = (len(remaining_nodes.index) - half_slice) // STRIDE
+            strides = (len(remaining_nodes.index) - half_slice) // STRIDE
         else:
-            spiral_iters = len(remaining_nodes.index) // STRIDE
+            strides = - (-len(remaining_nodes.index) // STRIDE)
 
-        for _ in range(spiral_iters):
+        for _ in range(strides):
             remaining_nodes, node_ids, prev_node = spiral_stride(
                 remaining_nodes,
                 node_ids,
