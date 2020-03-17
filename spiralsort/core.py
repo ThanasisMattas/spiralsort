@@ -22,6 +22,7 @@ from spiralsort import utils
 
 def master_offset(nodes, master_node_id):
     """offsets all nodes, so that master_node becomes the origin"""
+    nodes = nodes.copy()
     master_index = nodes.loc[nodes.node_id == master_node_id].index[0]
     nodes.x = nodes.x - nodes.loc[master_index, "x"]
     nodes.y = nodes.y - nodes.loc[master_index, "y"]
@@ -245,7 +246,7 @@ def spiral_stride(nodes,
     return nodes, node_ids, prev_node
 
 
-def spiralsort(nodes, master_node_id):
+def spiralsort(nodes_input, master_node_id):
     """spiralsorts the point-cloud, starting from the master_node
 
     The SpiralSort algorithm:
@@ -291,14 +292,14 @@ def spiralsort(nodes, master_node_id):
         nodes_sorted (df)    :  the spiralsorted point-cloud
     """
     # first, check if the node_ids are unique
-    utils.check_duplicated_ids(nodes)
+    utils.check_duplicated_ids(nodes_input)
 
     # final sequence of ids, used to sort the final dataframe,
     # initialized with the master node
     node_ids = [master_node_id]
 
     # make master_node the origin of the axes
-    nodes = master_offset(nodes, master_node_id)
+    nodes = master_offset(nodes_input, master_node_id)
 
     # initialize previous node with the master node (series)
     master_node = nodes.loc[nodes["node_id"] == master_node_id]
@@ -365,7 +366,7 @@ def spiralsort(nodes, master_node_id):
     nodes = pd.concat([master_node, nodes])
     # reorder nodes with respect to the spiral-sorted node_ids
     node_ids = pd.DataFrame({"node_id": node_ids})
-    nodes_sorted = node_ids.merge(nodes, on="node_id")            \
+    nodes_sorted = node_ids.merge(nodes_input, on="node_id")      \
                            .loc[:, ["node_id", 'x', 'y', 'z']]    \
                            .reset_index(drop=True, inplace=False)
 
