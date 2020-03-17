@@ -27,7 +27,17 @@ from spiralsort.core import spiralsort
 point_cloud_sorted = spiralsort(point_cloud, master_node_id)
 ```
 
-## How to istall
+3. docker container
+
+Insert input_file and take the output, using a shared volume between the
+host and the container.
+
+```
+$ docker run -it --rm -v ${PWD}/<host_dir>:<container_dir> thanasismatt/spiralsort bin/bash
+root@<container_id>:/# spiralsort <container_dir>/<file_name> <master_node_id>
+```
+
+## How to install
 
 ```bash
 $ pip install spiralsort
