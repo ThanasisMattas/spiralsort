@@ -39,3 +39,4 @@
 **/*.egg-info/*
 **/*.egg
 **/extras/*
+**/spiral_sort_visualization/*
