@@ -33,7 +33,8 @@ Insert input_file and take the output, using a shared volume between the
 host and the container.
 
 ```
-$ docker run -it --rm -v ${PWD}/<host_dir>:<container_dir> thanasismatt/spiralsort bin/bash
+$ docker pull thanasismatt/spiralsort:latest
+$ docker run -it --rm -v ${PWD}:<container_dir> thanasismatt/spiralsort bin/bash
 root@<container_id>:/# spiralsort <container_dir>/<file_name> <master_node_id>
 ```
 
