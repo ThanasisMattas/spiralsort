@@ -49,7 +49,8 @@ def spiral_sort_frame(current_node_idx,
     """plot a frame, as a 3D scatter, of the spiral-sort algorithm"""
     fig = plt.figure()
     sub = fig.add_subplot(111, projection="3d")
-    # sub.view_init(30, 0)
+    # rotate the frame, to aid visualization of the poin-cloud
+    sub.view_init(40, 30 + current_node_idx / 4)
     sub.use_sticky_edges = False
     # sub.margins(x=0, y=-0.45)
     plt.tight_layout()
@@ -61,7 +62,7 @@ def spiral_sort_frame(current_node_idx,
     # sub.set_zlabel('z')
     # fig.gca().set_xlim([-1, 1])
     # fig.gca().set_ylim([-1, 1])
-    fig.gca().set_zlim([-1, 0.1])
+    fig.gca().set_zlim([-0.6, 0.6])
 
     # color labels:
     # b: blue     g: green    r: red     m: magenta
@@ -105,7 +106,7 @@ def spiral_sort_frame(current_node_idx,
         sub.scatter(nodes_next_slices.x,
                     nodes_next_slices.y,
                     nodes_next_slices.z,
-                    c='lightgray', marker='D', s=3,
+                    c='lightgray', marker='D', s=4,
                     label="not in current slice ({})".format(
                         num_nodes_next_slices
                     ))
@@ -132,7 +133,8 @@ def spiral_sort_frame(current_node_idx,
 def plot_spiralsort(nodes_sorted, master_node_id, output_dir):
     """saves an image for each step of the spiralsorting algorithm"""
     nodes_sorted.reset_index(drop=True, inplace=True)
-    master_node = nodes_sorted.loc[nodes_sorted["node_id"] == master_node_id]
+    master_node = \
+        nodes_sorted.loc[nodes_sorted["node_id"] == master_node_id].squeeze()
     nodes_sorted["|node - master|"] = \
         core.distances_from_node(nodes_sorted, master_node)
 
@@ -303,7 +305,6 @@ def plot_spiralsort(nodes_sorted, master_node_id, output_dir):
             # 2. counterclock_filtered
             # 3. spiral_slice
             # 4. nodes_rest (rest to remaining_nodes)
-
             spiral_sort_frame(current_node_idx=i,
                               current_node_id=current_node_id,
                               next_node=nodes_sorted.iloc[i],
