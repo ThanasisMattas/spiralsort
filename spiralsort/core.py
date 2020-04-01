@@ -15,6 +15,7 @@ General Public License along with this program. If not, see
 
 
 import numpy as np
+from numba import njit
 import pandas as pd
 
 from spiralsort import utils
@@ -30,6 +31,18 @@ def master_offset(nodes, master_node_id):
     return nodes
 
 
+@njit(cache=True, nogil=True)
+def distances_from_node_numpy(nodes_x, nodes_y, nodes_z,
+                              node_x, node_y, node_z):
+    """numpy version of distances_from_node for numba optinization"""
+    distances = np.sqrt(
+        (nodes_x - node_x) ** 2
+        + (nodes_y - node_y) ** 2
+        + (nodes_z - node_z) ** 2
+    )
+    return distances
+
+
 def distances_from_node(nodes, node):
     """evaluates the distances (norm I2) of nodes from node
 
@@ -40,11 +53,9 @@ def distances_from_node(nodes, node):
     Returns:
         distances (array)
     """
-    distances = np.sqrt(
-        (nodes.x - node.x) ** 2
-        + (nodes.y - node.y) ** 2
-        + (nodes.z - node.z) ** 2
-    )
+    distances = distances_from_node_numpy(
+        nodes.x.values, nodes.y.values, nodes.z.values,
+        node.x, node.y, node.z)
     return distances
 
 
@@ -74,6 +85,14 @@ def prev_node_gradient(prev_node):
     return theta
 
 
+@njit(cache=True, nogil=True)
+def z_rotation_numpy(theta, nodes_x, nodes_y):
+    """numpy implementation of z_rotation for numba optimization"""
+    rotated_x = np.cos(theta) * nodes_x + np.sin(theta) * nodes_y
+    rotated_y = - np.sin(theta) * nodes_x + np.cos(theta) * nodes_y
+    return rotated_x, rotated_y
+
+
 def z_rotation(nodes, prev_node):
     """2D rotation on z axis (linear transformation), such as prev_node
     will fall on the 0x axis
@@ -95,8 +114,9 @@ def z_rotation(nodes, prev_node):
     """
     theta = prev_node_gradient(prev_node)
     rotated = nodes.copy()
-    rotated.x = np.cos(theta) * nodes.x + np.sin(theta) * nodes.y
-    rotated.y = - np.sin(theta) * nodes.x + np.cos(theta) * nodes.y
+    rotated.x, rotated.y = z_rotation_numpy(
+        theta, nodes.x.values, nodes.y.values
+    )
     return rotated
 
 
