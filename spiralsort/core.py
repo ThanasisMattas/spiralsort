@@ -59,8 +59,10 @@ def distances_from_node(nodes, node):
     return distances
 
 
-def prev_node_gradient(prev_node):
+def prev_node_xy_gradient(prev_node):
     """returns the angle of the prev_node vector from the 0x axis
+
+    **Deprecated**
 
     this is the angle that the point-cloud will be rotated, in order to
     filter the counterclockwise side of the prev_node vector
@@ -82,6 +84,13 @@ def prev_node_gradient(prev_node):
     # elif prev_node.iloc[0].x <= -0.001:
     else:
         theta = np.arctan(prev_node.y / prev_node.x) + np.pi
+    return theta
+
+
+@njit(cache=True, nogil=True)
+def prev_node_xy_gradient_numpy(prev_node_x, prev_node_y):
+    """returns the angle of the prev_node vector from the 0x axis"""
+    theta = np.angle(prev_node_x + prev_node_y * 1j)
     return theta
 
 
@@ -112,7 +121,8 @@ def z_rotation(nodes, prev_node):
     Returns:
         rotated (df)   :  the point-cloud after the rotation
     """
-    theta = prev_node_gradient(prev_node)
+    # theta = prev_node_xy_gradient(prev_node)
+    theta = prev_node_xy_gradient_numpy(prev_node.x, prev_node.y)
     rotated = nodes.copy()
     rotated.x, rotated.y = z_rotation_numpy(
         theta, nodes.x.values, nodes.y.values
