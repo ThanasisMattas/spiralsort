@@ -4,11 +4,14 @@ import os
 
 
 REQUIRED = ['click>=7.0',
+            'numba>=0.48.0',
             'numpy>=1.18.0',
             'pandas>=1.0.1']
 
-EXTRAS = {'plot each step': ['matplotlib>=3.1.3'],
-          'write video': ['ffmpeg']}
+EXTRAS = {
+    'plot each step': ['pillow>=7.0.0', 'matplotlib>=3.1.3'],
+    'write video': ['ffmpeg']
+}
 
 here = os.path.abspath(os.path.dirname(__file__))
 

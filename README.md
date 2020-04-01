@@ -6,8 +6,9 @@ A point-cloud spiral-sorting algorithm
 
 | requirements        | optional              | os        |
 | ------------------- | --------------------- | --------- |
-| python3             | matplotlib>=3.1.3     | GNU/Linux |
-| click>=7.0          | ffmpeg>=4.1.4         | Windows   |
+| python3             | pollow>=7.0.0         | GNU/Linux |
+| click>=7.0          | matplotlib>=3.1.3     | Windows   |
+| numba>=0.48.0       | ffmpeg>=4.1.4         |           |
 | numpy>=1.18.0       |                       |           |
 | pandas>=1.0.1       |                       |           |
 
