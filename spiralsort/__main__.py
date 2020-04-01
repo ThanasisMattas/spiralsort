@@ -34,8 +34,8 @@ from spiralsort.core import spiralsort
               " of the stepwise spiralsorting process")
 def main(file_path,
          master_node_id,
-         save_animation,
-         output_format):
+         save_animation=False,
+         output_format=None):
 
     start = timer()
     nodes = io.read_data_file(file_path)

@@ -1,381 +1,375 @@
+SpiralSorting completed. Duration: 0:00:32.003747
 Timer unit: 1e-06 s
 
-Total time: 13.0442 s
-Function: distances_from_node at line 32
+Total time: 0.004889 s
+Function: master_offset at line 24
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-    32                                           @profile
-    33                                           def distances_from_node(nodes, node):
-    34                                               """evaluates the distances (norm I2) of nodes from node
-    35                                           
-    36                                               Args:
-    37                                                   nodes (df)    :  has node_id, x, y, z columns
-    38                                                   node (df)
-    39                                           
-    40                                               Returns:
-    41                                                   distances (array)
-    42                                               """
-    43      4446       4265.0      1.0      0.0      distances = np.sqrt(
-    44                                                   (nodes.x - node.x) ** 2
-    45                                                   + (nodes.y - node.y) ** 2
-    46      4446   13034507.0   2931.7     99.9          + (nodes.z - node.z) ** 2
-    47                                               )
-    48      4446       5454.0      1.2      0.0      return distances
+    24                                           @profile
+    25                                           def master_offset(nodes, master_node_id):
+    26                                               """offsets all nodes, so that master_node becomes the origin"""
+    27         1        269.0    269.0      5.5      nodes = nodes.copy()
+    28         1       1427.0   1427.0     29.2      master_index = nodes.loc[nodes.node_id == master_node_id].index[0]
+    29         1       2005.0   2005.0     41.0      nodes.x = nodes.x - nodes.loc[master_index, "x"]
+    30         1        554.0    554.0     11.3      nodes.y = nodes.y - nodes.loc[master_index, "y"]
+    31         1        633.0    633.0     12.9      nodes.z = nodes.z - nodes.loc[master_index, "z"]
+    32         1          1.0      1.0      0.0      return nodes
 
-Total time: 1.31548 s
-Function: prev_node_gradient at line 51
+Total time: 1.78018 s
+Function: distances_from_node at line 47
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-    51                                           @profile
-    52                                           def prev_node_gradient(prev_node):
-    53                                               """returns the angle of the prev_node vector from the 0x axis
-    54                                           
-    55                                               this is the angle that the point cloud will be rotated, in order to
-    56                                               filter the counterclockwise side of the prev_node vector
-    57                                           
-    58                                               Args:
-    59                                                   prev_node (df) :  columns: ["node_id", 'x', 'y', 'z', ...]
-    60                                           
-    61                                               Returns:
-    62                                                   theta (float)  :  the gradient of the prev_node in radians
-    63                                               """
-    64      4445     419683.0     94.4     31.9      if ((prev_node.x < 0.001) and (prev_node.x > -0.001)
-    65         5        189.0     37.8      0.0              and (prev_node.y >= 0)):
-    66         2          2.0      1.0      0.0          theta = np.pi / 2
-    67      4443     309677.0     69.7     23.5      elif ((prev_node.x < 0.001) and (prev_node.x > -0.001)
-    68         3        130.0     43.3      0.0              and (prev_node.y < 0)):
-    69         3          3.0      1.0      0.0          theta = - np.pi / 2
-    70      4440     198523.0     44.7     15.1      elif prev_node.x >= 0.001:
-    71      2251     191586.0     85.1     14.6          theta = np.arctan(prev_node.y / prev_node.x)
-    72                                               # elif prev_node.iloc[0].x <= -0.001:
-    73                                               else:
-    74      2189     192266.0     87.8     14.6          theta = np.arctan(prev_node.y / prev_node.x) + np.pi
-    75      4445       3423.0      0.8      0.3      return theta
+    47                                           @profile
+    48                                           def distances_from_node(nodes, node):
+    49                                               """evaluates the distances (norm I2) of nodes from node
+    50
+    51                                               Args:
+    52                                                   nodes (df) :  the point-cloud
+    53                                                   node (df)  :  the reference node
+    54
+    55                                               Returns:
+    56                                                   distances (array)
+    57                                               """
+    58      8922     132311.0     14.8      7.4      distances = distances_from_node_numpy(
+    59      4461    1093561.0    245.1     61.4          nodes.x.values, nodes.y.values, nodes.z.values,
+    60      4461     551813.0    123.7     31.0          node.x, node.y, node.z)
+    61      4461       2497.0      0.6      0.1      return distances
 
-Total time: 14.1588 s
-Function: z_rotation at line 78
+Total time: 6.46319 s
+Function: z_rotation at line 108
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-    78                                           @profile
-    79                                           def z_rotation(nodes, prev_node):
-    80                                               """2D rotation on z axis (linear transformation), such as prev_node
-    81                                               will fall on the 0x axis
-    82                                           
-    83                                               transformation matrix:
-    84                                           
-    85                                                   | cos(theta)  sin(theta)|
-    86                                                   |-sin(theta)  cos(theta)|
-    87                                           
-    88                                               theta > 0 : clockwise
-    89                                               theta < 0 : counterclockwise
-    90                                           
-    91                                               Args:
-    92                                                   nodes (df)         :  the point cloud
-    93                                                   prev_node (df) :  the node that will fall on the 0x axis
-    94                                           
-    95                                               Returns:
-    96                                                   rotated (df)       :  the point cloud after the rotation
-    97                                               """
-    98      4445    1353354.0    304.5      9.6      theta = prev_node_gradient(prev_node)
-    99      4445    1056838.0    237.8      7.5      rotated = nodes.copy()
-   100      4445    6347106.0   1427.9     44.8      rotated.x = np.cos(theta) * nodes.x + np.sin(theta) * nodes.y
-   101      4445    5396299.0   1214.0     38.1      rotated.y = - np.sin(theta) * nodes.x + np.cos(theta) * nodes.y
-   102      4445       5177.0      1.2      0.0      return rotated
+   108                                           @profile
+   109                                           def z_rotation(nodes, prev_node):
+   110                                               """2D rotation on z axis (linear transformation), such as prev_node
+   111                                               will fall on the 0x axis
+   112
+   113                                               transformation matrix:
+   114
+   115                                                   | cos(theta)  sin(theta)|
+   116                                                   |-sin(theta)  cos(theta)|
+   117
+   118                                               theta > 0 : clockwise
+   119                                               theta < 0 : counterclockwise
+   120
+   121                                               Args:
+   122                                                   nodes (df)     :  the point-cloud
+   123                                                   prev_node (df) :  the node that will fall on the 0x axis
+   124
+   125                                               Returns:
+   126                                                   rotated (df)   :  the point-cloud after the rotation
+   127                                               """
+   128                                               # theta = prev_node_xy_gradient(prev_node)
+   129      4460     430184.0     96.5      6.7      theta = prev_node_xy_gradient_numpy(prev_node.x, prev_node.y)
+   130      4460     896240.0    201.0     13.9      rotated = nodes.copy()
+   131      8920    4301013.0    482.2     66.5      rotated.x, rotated.y = z_rotation_numpy(
+   132      4460     831270.0    186.4     12.9          theta, nodes.x.values, nodes.y.values
+   133                                               )
+   134      4460       4488.0      1.0      0.1      return rotated
 
-Total time: 18.9339 s
-Function: counterclockwise_filter at line 105
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   105                                           @profile
-   106                                           def counterclockwise_filter(nodes, prev_node):
-   107                                               """The goal is to force the algorithm to rotate anti-clockwise.
-   108                                               Rotating the nodes, so that the vector of prev_node becomes the 0x
-   109                                               axis, we keep only nodes with positive y, to find the next node from.
-   110                                           
-   111                                               Args:
-   112                                                   nodes (df)     :  the point cloud
-   113                                                   prev_node (df) :  the last popped node
-   114                                           
-   115                                               Returns:
-   116                                                   (index)        :  the indexes of the filtered nodes
-   117                                               """
-   118      4445   14198208.0   3194.2     75.0      nodes_rotated = z_rotation(nodes, prev_node)
-   119      4445    4723311.0   1062.6     24.9      nodes_filtered_index = nodes_rotated[nodes_rotated.y > 0].index
-   120                                           
-   121                                               # don't counterclockwise filter if prev_node is the master_node
-   122                                               # or no nodes are left after the filter
-   123      4445      10544.0      2.4      0.1      if len(nodes_filtered_index):
-   124      4440       1853.0      0.4      0.0          return nodes_filtered_index
-   125                                               else:
-   126         5          5.0      1.0      0.0          return nodes.index
-
-Total time: 14.4539 s
-Function: cost at line 129
+Total time: 13.206 s
+Function: counterclockwise_filter at line 137
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-   129                                           @profile
-   130                                           def cost(nodes, prev_node):
-   131                                               """|node - master| + |node - prev_node|
-   132                                           
-   133                                               Args:
-   134                                                   nodes (df)         : the point cloud
-   135                                                   prev_node (df)     : the node from which to calculate the cost
-   136                                           
-   137                                               Returns:
-   138                                                   cost_ (series)     : the cost column, to be inserted to the df
-   139                                               """
-   140      4445     452956.0    101.9      3.1      cost_ = nodes["|node - master|"].add(
-   141      4445   13997078.0   3148.9     96.8          distances_from_node(nodes, prev_node)
-   142                                               )
-   143      4445       3822.0      0.9      0.0      return cost_
+   137                                           @profile
+   138                                           def counterclockwise_filter(nodes, prev_node):
+   139                                               """The goal is to force the algorithm to rotate counter-clockwise.
+   140                                               After rotating the nodes, so that the vector of prev_node becomes
+   141                                               the 0x axis, only nodes with positive y are kept, to find the next
+   142                                               node from.
+   143
+   144                                               Args:
+   145                                                   nodes (df)     :  the point-cloud
+   146                                                   prev_node (df) :  the last popped node
+   147
+   148                                               Returns:
+   149                                                   (index)        :  the indexes of the filtered nodes
+   150                                               """
+   151      4460    6496461.0   1456.6     49.2      nodes_rotated = z_rotation(nodes, prev_node)
+   152      4460    6698245.0   1501.8     50.7      nodes_filtered_index = nodes_rotated[nodes_rotated.y > 0].index
+   153
+   154                                               # don't counterclockwise filter if prev_node is the master_node
+   155                                               # or no nodes are left after the filter
+   156      4460       9182.0      2.1      0.1      if len(nodes_filtered_index):
+   157      4451       2068.0      0.5      0.0          return nodes_filtered_index
+   158                                               else:
+   159         9          8.0      0.9      0.0          return nodes.index
 
-Total time: 1.15819 s
-Function: cost_sort at line 146
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-   146                                           @profile
-   147                                           def cost_sort(nodes, prev_node, ignore_index=True):
-   148                                               """sorts the nodes by cost from prev_node
-   149                                           
-   150                                               cost = |node - master| + |node - prev_node|
-   151                                           
-   152                                               Args:
-   153                                                   nodes (df)          : the point cloud
-   154                                                   prev_node (df)      : the node from which to calculate the cost
-   155                                                   ignore_index (bool) : whether to keep or reset the old index
-   156                                                                         (default True)
-   157                                           
-   158                                               Returns:
-   159                                                   nodes (df)          : the point cloud, cost-sorted
-   160                                               """
-   161       215      10409.0     48.4      0.9      with pd.option_context("mode.chained_assignment", None):
-   162       215     910658.0   4235.6     78.6          nodes.loc[:, "cost"] = cost(nodes, prev_node)
-   163       215        337.0      1.6      0.0          nodes.sort_values("cost", inplace=True, kind="mergesort",
-   164       215     236499.0   1100.0     20.4                            na_position="first", ignore_index=ignore_index)
-   165       215        286.0      1.3      0.0      return nodes
-
-Total time: 47.3958 s
-Function: pop_next_node at line 168
+Total time: 3.5674 s
+Function: cost at line 162
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-   168                                           @profile
-   169                                           def pop_next_node(nodes, prev_node):
-   170                                               """
-   171                                               1. evaluate cost
-   172                                               2. pop the next_node (the one with the min cost)
-   173                                           
-   174                                               Args:
-   175                                                   nodes (df)          : the point cloud
-   176                                                   prev_node (df)      : the last popped node
-   177                                           
-   178                                               Returns:
-   179                                                   nodes (df)          : the point cloud, without the currently
-   180                                                                         popped node
-   181                                                   next_node_id (str)
-   182                                                   next_node (series)
-   183                                               """
-   184      4230   20611078.0   4872.6     43.5      nodes_filtered = nodes.loc[counterclockwise_filter(nodes, prev_node)]
-   185                                           
-   186                                               # 1. evaluate cost
-   187      4230   18724380.0   4426.6     39.5      nodes_filtered.loc[:, "cost"] = cost(nodes_filtered, prev_node)
-   188                                           
-   189                                               # 2. pop the next_node
-   190      4230    1209051.0    285.8      2.6      next_node_idx = nodes_filtered["cost"].idxmin()
-   191      4230    2343542.0    554.0      4.9      next_node = nodes_filtered.loc[next_node_idx]
-   192      4230     248818.0     58.8      0.5      next_node_id = next_node.node_id
-   193      4230    4253227.0   1005.5      9.0      nodes = nodes[~nodes.index.isin([next_node.name])]
-   194      4230       5671.0      1.3      0.0      return nodes, next_node_id, next_node
+   162                                           @profile
+   163                                           def cost(nodes, prev_node):
+   164                                               """cost = |node - master| + |node - prev_node|
+   165
+   166                                               Args:
+   167                                                   nodes (df)         : the point-cloud
+   168                                                   prev_node (df)     : the node from which to calculate the cost
+   169
+   170                                               Returns:
+   171                                                   cost_ (series)     : the cost column, to be inserted to the df
+   172                                               """
+   173      8920    1854176.0    207.9     52.0      cost_ = nodes["|node - master|"].add(
+   174      4460    1709688.0    383.3     47.9          distances_from_node(nodes, prev_node)
+   175                                               )
+   176      4460       3538.0      0.8      0.1      return cost_
 
-Total time: 50.2716 s
-Function: spiral_stride at line 197
+Total time: 0.526702 s
+Function: cost_sort at line 179
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-   197                                           @profile
-   198                                           def spiral_stride(nodes,
-   199                                                             node_ids,
-   200                                                             prev_node,
-   201                                                             spiral_window,
-   202                                                             stride):
-   203                                               """moves one stride inside the spiral_window, iteretively popping
-   204                                               nodes with respect to the min cost
-   205                                           
-   206                                               Args:
-   207                                                   nodes (df)          :  the nodes batch that the algorithm is
-   208                                                                          woring on
-   209                                                   node_ids (list)     :  the so far spiral-sorted list of node_ids
-   210                                                   prev_node (df)      :  the last sorted (popped) node
-   211                                                   spiral_window (int) :  the window of nodes that the algorithm
-   212                                                                          will iteretively search for the next node
-   213                                                   stride (int)        :  the number of nodes to be sorted, before
-   214                                                                          moving to the next spiral_window
-   215                                           
-   216                                               Returns:
-   217                                                   nodes (df)          :  the initially nodes batch, without the
-   218                                                                          nodes popped at this stride
-   219                                                   node_ids (list)     :  the so far spiral-sorted list of node_ids
-   220                                                                          updated with the nodes popped at this
-   221                                                                          stride
-   222                                                   prev_node (df)      :  the last popped node at this stride
-   223                                               """
-   224                                               # keep a temp node_ids list, not to search through the whole list
-   225       282        199.0      0.7      0.0      node_ids_inner = []
-   226                                           
-   227                                               # for the first 1000 nodes dont filter the counterclockwise side
-   228                                               # nodes, to prevent from oscilating on a lobe (half spherical disk)
-   229       282        332.0      1.2      0.0      if len(node_ids) <= 1000:
-   230        67      17846.0    266.4      0.0          nodes_filtered = nodes[slice(0, spiral_window)]
-   231                                               else:
-   232       215    1096692.0   5100.9      2.2          nodes_filtered = nodes.loc[counterclockwise_filter(nodes, prev_node)]
-   233       215    1162583.0   5407.4      2.3          nodes_filtered = cost_sort(nodes, prev_node)
-   234       215      49500.0    230.2      0.1          nodes_filtered = nodes_filtered[slice(0, spiral_window)]
-   235                                           
-   236       282        946.0      3.4      0.0      iters = min(stride, len(nodes_filtered.index))
-   237                                           
-   238      4512       2950.0      0.7      0.0      for _ in range(iters):
-   239      4230       2634.0      0.6      0.0          nodes_filtered, prev_node_id, prev_node = pop_next_node(
-   240      4230       1978.0      0.5      0.0              nodes_filtered,
-   241      4230   47526120.0  11235.5     94.5              prev_node
-   242                                                   )
-   243      4230       5339.0      1.3      0.0          node_ids_inner.append(prev_node_id)
-   244                                           
-   245                                               # drop node_ids_inner from nodes remainder
-   246       282     403679.0   1431.5      0.8      nodes = nodes[~nodes.node_id.isin(node_ids_inner)]
-   247                                           
-   248                                               # update node_ids
-   249       282        596.0      2.1      0.0      node_ids += node_ids_inner
-   250                                           
-   251       282        169.0      0.6      0.0      return nodes, node_ids, prev_node
+   179                                           @profile
+   180                                           def cost_sort(nodes, prev_node, ignore_index=True):
+   181                                               """sorts the nodes by cost from prev_node
+   182
+   183                                               cost = |node - master| + |node - prev_node|
+   184
+   185                                               Args:
+   186                                                   nodes (df)          : the point-cloud
+   187                                                   prev_node (df)      : the node from which to calculate the cost
+   188                                                   ignore_index (bool) : whether to keep or reset the old index
+   189                                                                         (default True)
+   190
+   191                                               Returns:
+   192                                                   nodes (df)          : the point-cloud, cost-sorted
+   193                                               """
+   194       216       9168.0     42.4      1.7      with pd.option_context("mode.chained_assignment", None):
+   195       216     321612.0   1488.9     61.1          nodes.loc[:, "cost"] = cost(nodes, prev_node)
+   196       432     195601.0    452.8     37.1          nodes.sort_values("cost", inplace=True, kind="mergesort",
+   197       216        101.0      0.5      0.0                            na_position="first", ignore_index=ignore_index)
+   198       216        220.0      1.0      0.0      return nodes
 
-Total time: 50.3547 s
-Function: spiralsort at line 262
+Total time: 29.9557 s
+Function: pop_next_node at line 201
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-   262                                           @profile
-   263                                           def spiralsort(nodes, master_node_id):
-   264                                               """spiral-sorting the node-cloud, starting from the master node
-   265                                           
-   266                                               Spiral-sorting algorithm:
-   267                                               1. Sort the point cloud with respect to the distance from the master
-   268                                                  node and segment it into slices.
-   269                                               2. Take the first slice (2000 nodes
-   270                                               3. Take a SPIRAL_WINDOW (slice further)
-   271                                                  Spiral windows for the 1st slice consist of 300 nodes, starting
-   272                                                  from the last sorted node (the master_node for the 1st window)
-   273                                               4. Iteretively pop 20 nodes (a stride), by the minimum cost.
-   274                                                  (cost = |node - master_node| + |node - prev_node|)
-   275                                                  Take the next SPIRAL_WINDOW and pop the next 10 nodes.
-   276                                                  Continue until the remainder of the nodes reaches the size of the
-   277                                                  half slice (1000 nodes for the 1st slice).
-   278                                               5. Merge the remaining nodes with the next slice
-   279                                                  (This overlap of the slices ensures that there is a continuity
-   280                                                   while selecting the next nodes when the algorithm reaches the
-   281                                                   last nodes of the slice)
-   282                                               6. For the next slices, a filter is applied, which keeps only nodes
-   283                                                  from the counterclockwise side of the vector starting from the
-   284                                                  master node and ending at the previous node,in order to force the
-   285                                                  algorithm to move to a constant rotation direction
-   286                                               7. Keep moving by SPIRAL_WINDOWs (or strides), counterclockwise
-   287                                                  filtering at each stride, popping 10s of nodes until the half
-   288                                                  slice thresshold
-   289                                               8. Upon reaching the last slice, remove the half_slice threshold, to
-   290                                                  pop all the remaining nodes.
-   291                                           
-   292                                               Args:
-   293                                                   nodes (df)           :  the box_nodes (without the bar_nodes)
-   294                                                   master_node_id (str) :  the node on the box surface where the
-   295                                                                            deformation starts
-   296                                           
-   297                                               Returns:
-   298                                                   nodes_sorted (df)    :  the nodes spiral-sorted, starting from
-   299                                                                           the master node
-   300                                               """
-   301                                               # first, check if the node_ids are unique
-   302         1       2054.0   2054.0      0.0      check_duplicated_ids(nodes)
-   303                                           
-   304                                               # final sequence of ids, used to sort the final dataframe,
-   305                                               # initialized with the master node
-   306         1          1.0      1.0      0.0      node_ids = [master_node_id]
-   307                                           
-   308                                               # make master_node the origin of the axes
-   309         1       4222.0   4222.0      0.0      nodes = master_offset(nodes, master_node_id)
-   310                                           
-   311                                               # initialize previous node with the master node (series)
-   312         1       1758.0   1758.0      0.0      master_node = nodes.loc[nodes["node_id"] == master_node_id]
-   313         1        584.0    584.0      0.0      prev_node = master_node.iloc[0]
-   314                                           
-   315                                               # drop master node
-   316         1       1251.0   1251.0      0.0      nodes.drop(master_node.index, inplace=True)
-   317                                           
-   318                                               # distance of all nodes from the master node
-   319         1       3490.0   3490.0      0.0      nodes["|node - master|"] = distances_from_node(nodes, prev_node)
-   320                                           
-   321                                               # distance-sort from master_node
-   322         1          2.0      2.0      0.0      nodes.sort_values("|node - master|", inplace=True, kind="mergesort",
-   323         1       1704.0   1704.0      0.0                        ignore_index=True)
-   324                                           
-   325                                               # segment nodes into slices, not to work on the whole df
-   326                                               # [
-   327                                               #     [0, 2000], [2000, 6000], [6000, 14000], [14000, 30000],
-   328                                               #     [30000, 62000], [62000, 94000], [94000, 126000], ...
-   329                                               # ]
-   330         1       1127.0   1127.0      0.0      slices = util.create_slices(nodes)
-   331                                           
-   332                                               # number of nodes anti-clockwise filtered and cost_sorted from prev
-   333                                               # node, in order to iteretively pop the next nodes in the STRIDE
-   334         1          1.0      1.0      0.0      SPIRAL_WINDOW = 400
-   335         1          0.0      0.0      0.0      STRIDE = 15
-   336                                           
-   337                                               # this is the container that the sorting algorithm will work with
-   338         1       3839.0   3839.0      0.0      remaining_nodes = pd.DataFrame(columns=nodes.columns)
-   339                                           
-   340         3          5.0      1.7      0.0      for idx, slicing_obj in enumerate(slices):
-   341                                           
-   342                                                   # moving to more distant slices, spiral_window gets bigger, as
-   343                                                   # the nodes are more spread out away from the master node
-   344         2          2.0      1.0      0.0          spiral_window = int(SPIRAL_WINDOW + 100 * idx)
-   345                                           
-   346                                                   # Concat with the remainder of the nodes (which is the half of
-   347                                                   # the previous slice), in order to have continuity.
-   348                                                   # (For example, previous to last node will only have the last
-   349                                                   # remaining node to find the next cost-sorted node, which is
-   350                                                   # not correct, because there are other candidates, not included
-   351                                                   # in the current slice.)
-   352         2       3074.0   1537.0      0.0          remaining_nodes = pd.concat([remaining_nodes, nodes[slicing_obj]])
-   353                                           
-   354         2         31.0     15.5      0.0          half_slice = util.calc_half_slice(slicing_obj)
-   355                                           
-   356                                                   # leave half_slice remaining nodes to merge with the next slice
-   357                                                   # except from the last slice
-   358         2          4.0      2.0      0.0          if (slicing_obj in slices[: -1]) and (len(slices) > 1):
-   359         1          2.0      2.0      0.0              spiral_iters = (len(remaining_nodes.index) - half_slice) // STRIDE
-   360                                                   else:
-   361         1          2.0      2.0      0.0              spiral_iters = len(remaining_nodes.index) // STRIDE
-   362                                           
-   363       284        368.0      1.3      0.0          for _ in range(spiral_iters):
-   364       282        269.0      1.0      0.0              remaining_nodes, node_ids, prev_node = spiral_stride(
-   365       282        284.0      1.0      0.0                  remaining_nodes,
-   366       282        232.0      0.8      0.0                  node_ids,
-   367       282        230.0      0.8      0.0                  prev_node,
-   368       282        249.0      0.9      0.0                  spiral_window,
-   369       282   50292752.0 178343.1     99.9                  STRIDE
-   370                                                       )
-   371                                           
-   372                                               # return master node to nodes
-   373         1       4779.0   4779.0      0.0      nodes = pd.concat([master_node, nodes])
-   374                                               # reorder nodes with respect to the spiral-sorted node_ids
-   375         1       2438.0   2438.0      0.0      node_ids = pd.DataFrame({"node_id": node_ids})
-   376         1      25416.0  25416.0      0.1      nodes_sorted = node_ids.merge(nodes, on="node_id")            \
-   377         1       3918.0   3918.0      0.0                             .loc[:, ["node_id", 'x', 'y', 'z']]    \
-   378         1        593.0    593.0      0.0                             .reset_index(drop=True, inplace=False)
-   379                                           
-   380         1          2.0      2.0      0.0      return nodes_sorted
+   201                                           @profile
+   202                                           def pop_next_node(nodes, prev_node):
+   203                                               """nodewise step of the algorithm
+   204
+   205                                               1. evaluate cost
+   206                                               2. pop the node with the min cost
+   207
+   208                                               Args:
+   209                                                   nodes (df)          : the point-cloud
+   210                                                   prev_node (df)      : the last popped node
+   211
+   212                                               Returns:
+   213                                                   nodes (df)          : the point-cloud, without the currently
+   214                                                                         popped node
+   215                                                   next_node_id (str)  : to be appended to the node_ids list
+   216                                                   next_node (series)  : the currently popped node
+   217                                               """
+   218      4244   14868862.0   3503.5     49.6      nodes_filtered = nodes.loc[counterclockwise_filter(nodes, prev_node)]
+   219
+   220                                               # 1. evaluate cost
+   221      4244    7969117.0   1877.7     26.6      nodes_filtered.loc[:, "cost"] = cost(nodes_filtered, prev_node)
+   222
+   223                                               # 2. pop the next_node
+   224      4244    1066565.0    251.3      3.6      next_node_idx = nodes_filtered["cost"].idxmin()
+   225      4244    2086345.0    491.6      7.0      next_node = nodes_filtered.loc[next_node_idx]
+   226      4244     215913.0     50.9      0.7      next_node_id = next_node.node_id
+   227      4244    3744092.0    882.2     12.5      nodes = nodes[~nodes.index.isin([next_node.name])]
+   228      4244       4846.0      1.1      0.0      return nodes, next_node_id, next_node
+
+Total time: 31.8062 s
+Function: spiral_stride at line 231
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   231                                           @profile
+   232                                           def spiral_stride(nodes,
+   233                                                             node_ids,
+   234                                                             prev_node,
+   235                                                             spiral_window,
+   236                                                             stride):
+   237                                               """moves one stride inside the spiral_window, iteretively popping
+   238                                               nodes with respect to the min cost
+   239
+   240                                               Args:
+   241                                                   nodes (df)          :  the nodes batch that the algorithm is
+   242                                                                          woring on
+   243                                                   node_ids (list)     :  the so far spiral-sorted list of node_ids
+   244                                                   prev_node (df)      :  the last sorted (popped) node
+   245                                                   spiral_window (int) :  the window of nodes that the algorithm
+   246                                                                          will iteretively search for the next node
+   247                                                   stride (int)        :  the number of nodes to be sorted, before
+   248                                                                          moving to the next spiral_window
+   249
+   250                                               Returns:
+   251                                                   nodes (df)          :  the initially nodes batch, without the
+   252                                                                          nodes popped at this stride
+   253                                                   node_ids (list)     :  the so far spiral-sorted list of node_ids
+   254                                                                          updated with the nodes popped at this
+   255                                                                          stride
+   256                                                   prev_node (df)      :  the last popped node at this stride
+   257                                               """
+   258                                               # keep a temp node_ids list, not to search through the whole list
+   259       283        253.0      0.9      0.0      node_ids_inner = []
+   260
+   261                                               # for the first 1000 nodes dont filter the counterclockwise side
+   262                                               # nodes, to prevent from oscilating on a lobe (half spherical disk)
+   263       283        272.0      1.0      0.0      if len(node_ids) <= 1000:
+   264        67      19709.0    294.2      0.1          nodes_filtered = nodes[slice(0, spiral_window)]
+   265                                               else:
+   266       216     772829.0   3577.9      2.4          nodes_filtered = nodes.loc[counterclockwise_filter(nodes, prev_node)]
+   267       216     530015.0   2453.8      1.7          nodes_filtered = cost_sort(nodes, prev_node)
+   268       216      41616.0    192.7      0.1          nodes_filtered = nodes_filtered[slice(0, spiral_window)]
+   269
+   270       283        943.0      3.3      0.0      iters = min(stride, len(nodes_filtered.index))
+   271
+   272      4527       3265.0      0.7      0.0      for _ in range(iters):
+   273      8488   30062621.0   3541.8     94.5          nodes_filtered, prev_node_id, prev_node = pop_next_node(
+   274      4244       1977.0      0.5      0.0              nodes_filtered,
+   275      4244       1907.0      0.4      0.0              prev_node
+   276                                                   )
+   277      4244       5850.0      1.4      0.0          node_ids_inner.append(prev_node_id)
+   278
+   279                                               # drop node_ids_inner from nodes remainder
+   280       283     364250.0   1287.1      1.1      nodes = nodes[~nodes.node_id.isin(node_ids_inner)]
+   281
+   282                                               # update node_ids
+   283       283        542.0      1.9      0.0      node_ids += node_ids_inner
+   284
+   285       283        170.0      0.6      0.0      return nodes, node_ids, prev_node
+
+Total time: 31.9636 s
+Function: spiralsort at line 288
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   288                                           @profile
+   289                                           def spiralsort(nodes_input, master_node_id):
+   290                                               """spiralsorts the point-cloud, starting from the master_node
+   291
+   292                                               The SpiralSort algorithm:
+   293                                               1. Sort the point cloud with respect to the distance from the master
+   294                                                  node
+   295                                               2. Segment it into slices and take the first slice
+   296                                               3. Take a SPIRAL_WINDOW (slice further)
+   297                                                  Spiral windows for the 1st slice consist of 400 nodes, starting
+   298                                                  from the last sorted node (the master_node for the 1st window)
+   299                                               4. Iteretively pop 15 nodes (a STRIDE), by the minimum cost. Namely,
+   300                                                  a SPIRAL_WINDOW is sliced to spiralsort a STRIDE of nodes, before
+   301                                                  moving to the next SPIRAL_WINDOW.
+   302                                                  (cost = |node - master_node| + |node - prev_node|)
+   303                                                  At each iterative step, a filter is applied, keeping only nodes
+   304                                                  from the counterclockwise side of the vector that starts from the
+   305                                                  master node and ends at the previous node, in order to force the
+   306                                                  algorithm to move on a constant rotating direction.
+   307                                               5. Take the next SPIRAL_WINDOW and pop the next STRIDE.
+   308                                               6. Continue until the remainder of the nodes reaches the size of the
+   309                                                  half slice (1000 nodes for the 1st slice).
+   310                                               7. Merge the remaining nodes with the next slice
+   311                                                  This overlap of the slices ensures that there is a continuity
+   312                                                  while selecting the next nodes, when the algorithm reaches the
+   313                                                  last nodes of the slice.
+   314                                               8. For the next slices, while moving away from the master_node, the
+   315                                                  SPIRAL_WINDOW is selected differently. Specifically, before each
+   316                                                  STRIDE, the counterclockwise filter is applied, then the
+   317                                                  remaining nodes are cost-sorted (with respect to their cost) from
+   318                                                  the last spiralsorted node and, finally, a SPIRAL_WINDOW is
+   319                                                  sliced, to start the iterative spiralsorting of the nodes in the
+   320                                                  next STRIDE.
+   321                                               9. Keep moving by SPIRAL_WINDOWs, counterclockwise
+   322                                                  filtering at each stride, popping STRIDEs of nodes until the half
+   323                                                  slice thresshold.
+   324                                               10. Upon reaching the last slice, remove the *half_slice* threshold,
+   325                                                  to pop all the remaining nodes.
+   326
+   327                                               Args:
+   328                                                   nodes (df)           :  the point-cloud
+   329                                                   master_node_id (str) :  the node where spiralsorting starts
+   330
+   331                                               Returns:
+   332                                                   nodes_sorted (df)    :  the spiralsorted point-cloud
+   333                                               """
+   334                                               # first, check if the node_ids are unique
+   335         1       2069.0   2069.0      0.0      utils.check_duplicated_ids(nodes_input)
+   336
+   337                                               # final sequence of ids, used to sort the final dataframe,
+   338                                               # initialized with the master node
+   339         1          2.0      2.0      0.0      node_ids = [master_node_id]
+   340
+   341                                               # make master_node the origin of the axes
+   342         1       4908.0   4908.0      0.0      nodes = master_offset(nodes_input, master_node_id)
+   343
+   344                                               # initialize previous node with the master node (series)
+   345         1       1256.0   1256.0      0.0      master_node = nodes.loc[nodes["node_id"] == master_node_id]
+   346         1        513.0    513.0      0.0      prev_node = master_node.iloc[0]
+   347
+   348                                               # drop master node
+   349         1       1245.0   1245.0      0.0      nodes.drop(master_node.index, inplace=True)
+   350
+   351                                               # distance of all nodes from the master node
+   352         1     103170.0 103170.0      0.3      nodes["|node - master|"] = distances_from_node(nodes, prev_node)
+   353
+   354                                               # distance-sort from master_node
+   355         2       1418.0    709.0      0.0      nodes.sort_values("|node - master|", inplace=True, kind="mergesort",
+   356         1          0.0      0.0      0.0                        ignore_index=True)
+   357
+   358                                               # segment nodes into slices, not to work on the whole df
+   359                                               # [
+   360                                               #     [0, 2000], [2000, 6000], [6000, 14000], [14000, 30000],
+   361                                               #     [30000, 62000], [62000, 94000], [94000, 126000], ...
+   362                                               # ]
+   363         1       1109.0   1109.0      0.0      slices = utils.create_slices(nodes)
+   364
+   365                                               # number of nodes anti-clockwise filtered and cost_sorted from prev
+   366                                               # node, in order to iteretively pop the next nodes in the STRIDE
+   367         1          1.0      1.0      0.0      SPIRAL_WINDOW = 400
+   368         1          0.0      0.0      0.0      STRIDE = 15
+   369
+   370                                               # this is the container that the sorting algorithm will work with
+   371         1       4211.0   4211.0      0.0      remaining_nodes = pd.DataFrame(columns=nodes.columns)
+   372
+   373         3          6.0      2.0      0.0      for idx, slicing_obj in enumerate(slices):
+   374
+   375                                                   # moving to more distant slices, spiral_window gets bigger, as
+   376                                                   # the nodes are more spread out away from the master node
+   377         2          4.0      2.0      0.0          spiral_window = int(SPIRAL_WINDOW + 100 * idx)
+   378
+   379                                                   # Concat with the remainder of the nodes (which is the half of
+   380                                                   # the previous slice), in order to have continuity.
+   381                                                   # (For example, previous to last node will only have the last
+   382                                                   # remaining node to find the next cost-sorted node, which is
+   383                                                   # not correct, because there are other candidates, not included
+   384                                                   # in the current slice.)
+   385         2       3439.0   1719.5      0.0          remaining_nodes = pd.concat([remaining_nodes, nodes[slicing_obj]])
+   386
+   387         2         14.0      7.0      0.0          half_slice = utils.calc_half_slice(slicing_obj)
+   388
+   389                                                   # leave half_slice remaining nodes to merge with the next slice
+   390                                                   # except from the last slice
+   391         2          3.0      1.5      0.0          if (slicing_obj in slices[: -1]) and (len(slices) > 1):
+   392         1          2.0      2.0      0.0              strides = (len(remaining_nodes.index) - half_slice) // STRIDE
+   393                                                   else:
+   394         1          2.0      2.0      0.0              strides = - (-len(remaining_nodes.index) // STRIDE)
+   395
+   396       285        325.0      1.1      0.0          for _ in range(strides):
+   397       566   31829167.0  56235.3     99.6              remaining_nodes, node_ids, prev_node = spiral_stride(
+   398       283        259.0      0.9      0.0                  remaining_nodes,
+   399       283        243.0      0.9      0.0                  node_ids,
+   400       283        241.0      0.9      0.0                  prev_node,
+   401       283        223.0      0.8      0.0                  spiral_window,
+   402       283        230.0      0.8      0.0                  STRIDE
+   403                                                       )
+   404
+   405                                               # return master node to nodes
+   406         1       2648.0   2648.0      0.0      nodes = pd.concat([master_node, nodes])
+   407                                               # reorder nodes with respect to the spiral-sorted node_ids
+   408         1       1048.0   1048.0      0.0      node_ids = pd.DataFrame({"node_id": node_ids})
+   409         3       5849.0   1949.7      0.0      nodes_sorted = node_ids.merge(nodes_input, on="node_id")      \
+   410         1          1.0      1.0      0.0                             .loc[:, ["node_id", 'x', 'y', 'z']]    \
+   411         1          1.0      1.0      0.0                             .reset_index(drop=True, inplace=False)
+   412
+   413         1          1.0      1.0      0.0      return nodes_sorted
 
