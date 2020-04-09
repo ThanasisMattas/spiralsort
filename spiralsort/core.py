@@ -44,7 +44,7 @@ def distances_from_node_numpy(nodes_x, nodes_y, nodes_z,
 
 
 def distances_from_node(nodes, node):
-    """evaluates the distances (norm I2) of nodes from node
+    """evaluates the distances (norm L2) of nodes from node
 
     Args:
         nodes (df) :  the point-cloud
@@ -131,10 +131,13 @@ def z_rotation(nodes, prev_node):
 
 
 def counterclockwise_filter(nodes, prev_node):
-    """The goal is to force the algorithm to rotate counter-clockwise.
-    After rotating the nodes, so that the vector of prev_node becomes
-    the 0x axis, only nodes with positive y are kept, to find the next
-    node from.
+    """keeps only nodes from the counterclockwise side of the vector
+    that starts at the master_node and ends at prev_node
+
+    The goal is to force the algorithm to spiral counter-clockwise. This
+    is achieved by rotating the cloud, so that the vector of prev_node
+    falls on the (positive side of) x axis, and keeping only the nodes
+    with positive y.
 
     Args:
         nodes (df)     :  the point-cloud
