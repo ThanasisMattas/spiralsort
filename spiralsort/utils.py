@@ -55,16 +55,16 @@ def point_cloud_mock():
 
     cloud["d_squared"] = cloud.x ** 2 + cloud.y ** 2 + cloud.z ** 2
 
-    # exclude an inner sphere and pick the topmost node as the master
+    # exclude an inner sphere and pick the topmost node as the start
     # node, to assist visualization
     cloud = cloud[cloud.d_squared > 0.21]
-    master_node_id = cloud.loc[cloud.z.idxmax(), "node_id"]
+    start_node_id = cloud.loc[cloud.z.idxmax(), "node_id"]
 
     # have a sneak peek
     # from spiralsort import spiralsort_post as ssp
     # ssp.quick_scatter(cloud.x, cloud.y, cloud.z)
 
-    return cloud.loc[:, ["node_id", 'x', 'y', 'z']], master_node_id
+    return cloud.loc[:, ["node_id", 'x', 'y', 'z']], start_node_id
 
 
 def create_slices(nodes):

@@ -12,10 +12,10 @@ def main():
     nodes = io.read_data_file(input_file)
 
     # say spiralsorting starts form the node with id "N_4004"
-    master_node_id = "N_4004"
+    start_node_id = "N_4004"
 
     # spiralsort
-    sorted_nodes = spiralsort(nodes, master_node_id)
+    sorted_nodes = spiralsort(nodes, start_node_id)
 
     # write output
     output_file = io.output_file_path(input_file)

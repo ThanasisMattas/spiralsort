@@ -21,13 +21,13 @@ import pandas as pd
 from spiralsort import utils
 
 
-def master_offset(nodes, master_node_id):
-    """offsets all nodes, so that master_node becomes the origin"""
+def start_offset(nodes, start_node_id):
+    """offsets all nodes, so that start_node becomes the origin"""
     nodes = nodes.copy()
-    master_index = nodes.loc[nodes.node_id == master_node_id].index[0]
-    nodes.x = nodes.x - nodes.loc[master_index, "x"]
-    nodes.y = nodes.y - nodes.loc[master_index, "y"]
-    nodes.z = nodes.z - nodes.loc[master_index, "z"]
+    start_index = nodes.loc[nodes.node_id == start_node_id].index[0]
+    nodes.x = nodes.x - nodes.loc[start_index, "x"]
+    nodes.y = nodes.y - nodes.loc[start_index, "y"]
+    nodes.z = nodes.z - nodes.loc[start_index, "z"]
     return nodes
 
 
@@ -132,7 +132,7 @@ def z_rotation(nodes, prev_node):
 
 def counterclockwise_filter(nodes, prev_node):
     """keeps only nodes from the counterclockwise side of the vector
-    that starts at the master_node and ends at prev_node
+    that starts at the start_node and ends at prev_node
 
     The goal is to force the algorithm to spiral counter-clockwise. This
     is achieved by rotating the cloud, so that the vector of prev_node
@@ -149,7 +149,7 @@ def counterclockwise_filter(nodes, prev_node):
     nodes_rotated = z_rotation(nodes, prev_node)
     nodes_filtered_index = nodes_rotated[nodes_rotated.y > 0].index
 
-    # don't counterclockwise filter if prev_node is the master_node
+    # don't counterclockwise filter if prev_node is the start_node
     # or no nodes are left after the filter
     if len(nodes_filtered_index):
         return nodes_filtered_index
@@ -158,7 +158,7 @@ def counterclockwise_filter(nodes, prev_node):
 
 
 def cost(nodes, prev_node):
-    """cost = |node - master| + |node - prev_node|
+    """cost = |node - start| + |node - prev_node|
 
     Args:
         nodes (df)         : the point-cloud
@@ -167,7 +167,7 @@ def cost(nodes, prev_node):
     Returns:
         cost_ (series)     : the cost column, to be inserted to the df
     """
-    cost_ = nodes["|node - master|"].add(
+    cost_ = nodes["|node - start|"].add(
         distances_from_node(nodes, prev_node)
     )
     return cost_
@@ -176,7 +176,7 @@ def cost(nodes, prev_node):
 def cost_sort(nodes, prev_node, ignore_index=True):
     """sorts the nodes by cost from prev_node
 
-    cost = |node - master| + |node - prev_node|
+    cost = |node - start| + |node - prev_node|
 
     Args:
         nodes (df)          : the point-cloud
@@ -279,23 +279,23 @@ def spiral_stride(nodes,
     return nodes, node_ids, prev_node
 
 
-def spiralsort(nodes_input, master_node_id):
-    """spiralsorts the point-cloud, starting from the master_node
+def spiralsort(nodes_input, start_node_id):
+    """spiralsorts the point-cloud, starting from the start_node
 
     The SpiralSort algorithm:
-    1. Sort the point cloud with respect to the distance from the master
+    1. Sort the point cloud with respect to the distance from the start
        node
     2. Segment it into slices and take the first slice
     3. Take a SPIRAL_WINDOW (slice further)
        Spiral windows for the 1st slice consist of 400 nodes, starting
-       from the last sorted node (the master_node for the 1st window)
+       from the last sorted node (the start_node for the 1st window)
     4. Iteretively pop 15 nodes (a STRIDE), by the minimum cost. Namely,
        a SPIRAL_WINDOW is sliced to spiralsort a STRIDE of nodes, before
        moving to the next SPIRAL_WINDOW.
-       (cost = |node - master_node| + |node - prev_node|)
+       (cost = |node - start_node| + |node - prev_node|)
        At each iterative step, a filter is applied, keeping only nodes
        from the counterclockwise side of the vector that starts from the
-       master node and ends at the previous node, in order to force the
+       start node and ends at the previous node, in order to force the
        algorithm to move on a constant rotating direction.
     5. Take the next SPIRAL_WINDOW and pop the next STRIDE.
     6. Continue until the remainder of the nodes reaches the size of the
@@ -304,7 +304,7 @@ def spiralsort(nodes_input, master_node_id):
        This overlap of the slices ensures that there is a continuity
        while selecting the next nodes, when the algorithm reaches the
        last nodes of the slice.
-    8. For the next slices, while moving away from the master_node, the
+    8. For the next slices, while moving away from the start_node, the
        SPIRAL_WINDOW is selected differently. Specifically, before each
        STRIDE, the counterclockwise filter is applied, then the
        remaining nodes are cost-sorted (with respect to their cost) from
@@ -319,7 +319,7 @@ def spiralsort(nodes_input, master_node_id):
 
     Args:
         nodes (df)           :  the point-cloud
-        master_node_id (str) :  the node where spiralsorting starts
+        start_node_id (str) :  the node where spiralsorting starts
 
     Returns:
         nodes_sorted (df)    :  the spiralsorted point-cloud
@@ -328,24 +328,24 @@ def spiralsort(nodes_input, master_node_id):
     utils.check_duplicated_ids(nodes_input)
 
     # final sequence of ids, used to sort the final dataframe,
-    # initialized with the master node
-    node_ids = [master_node_id]
+    # initialized with the start node
+    node_ids = [start_node_id]
 
-    # make master_node the origin of the axes
-    nodes = master_offset(nodes_input, master_node_id)
+    # make start_node the origin of the axes
+    nodes = start_offset(nodes_input, start_node_id)
 
-    # initialize previous node with the master node (series)
-    master_node = nodes.loc[nodes["node_id"] == master_node_id]
-    prev_node = master_node.iloc[0]
+    # initialize previous node with the start node (series)
+    start_node = nodes.loc[nodes["node_id"] == start_node_id]
+    prev_node = start_node.iloc[0]
 
-    # drop master node
-    nodes.drop(master_node.index, inplace=True)
+    # drop start node
+    nodes.drop(start_node.index, inplace=True)
 
-    # distance of all nodes from the master node
-    nodes["|node - master|"] = distances_from_node(nodes, prev_node)
+    # distance of all nodes from the start node
+    nodes["|node - start|"] = distances_from_node(nodes, prev_node)
 
-    # distance-sort from master_node
-    nodes.sort_values("|node - master|", inplace=True, kind="mergesort",
+    # distance-sort from start_node
+    nodes.sort_values("|node - start|", inplace=True, kind="mergesort",
                       ignore_index=True)
 
     # segment nodes into slices, not to work on the whole df
@@ -366,7 +366,7 @@ def spiralsort(nodes_input, master_node_id):
     for idx, slicing_obj in enumerate(slices):
 
         # moving to more distant slices, spiral_window gets bigger, as
-        # the nodes are more spread out away from the master node
+        # the nodes are more spread out away from the start node
         spiral_window = int(SPIRAL_WINDOW + 100 * idx)
 
         # Concat with the remainder of the nodes (which is the half of
@@ -395,8 +395,8 @@ def spiralsort(nodes_input, master_node_id):
                 STRIDE
             )
 
-    # return master node to nodes
-    nodes = pd.concat([master_node, nodes])
+    # return start node to nodes
+    nodes = pd.concat([start_node, nodes])
     # reorder nodes with respect to the spiral-sorted node_ids
     node_ids = pd.DataFrame({"node_id": node_ids})
     nodes_sorted = node_ids.merge(nodes_input, on="node_id")      \

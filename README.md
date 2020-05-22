@@ -17,7 +17,7 @@ A point-cloud spiral-sorting algorithm
 1. command line
 
 ```bash
-$ spiralsort <file_name> <master_node_id>
+$ spiralsort <file_name> <start_node_id>
 ```
 
 2. inside a python script
@@ -25,7 +25,7 @@ $ spiralsort <file_name> <master_node_id>
 ```python
 from spiralsort.core import spiralsort
 
-point_cloud_sorted = spiralsort(point_cloud, master_node_id)
+point_cloud_sorted = spiralsort(point_cloud, start_node_id)
 ```
 
 3. docker container
@@ -36,7 +36,7 @@ host and the container.
 ```
 $ docker pull thanasismatt/spiralsort:latest
 $ docker run -it --rm -v ${PWD}:<container_dir> thanasismatt/spiralsort bin/bash
-root@<container_id>:/# spiralsort <container_dir>/<file_name> <master_node_id>
+root@<container_id>:/# spiralsort <container_dir>/<file_name> <start_node_id>
 ```
 
 ## How to install
@@ -60,26 +60,26 @@ supported formats: csv, json
 
 ## How it works
 
-Starting from the *master_node* the algorithm evaluates a cost for each node and
+Starting from the *start_node* the algorithm evaluates a cost for each node and
 moves to the <br /> node with the minimum cost (cost for node<sup>i+1</sup> is
 the distance from node<sup>i</sup> plus the distance from <br /> the
-master_node). At each step, a counterclockwise filter is applied, in order to
+start_node). At each step, a counterclockwise filter is applied, in order to
 force a constant <br /> rotational direction.
 
 Optimizing the process, a methodology of slicing is applied on the point-cloud,
 described by the <br /> following steps:
 
-1. Sort the point cloud with respect to the distance from the master node
+1. Sort the point cloud with respect to the distance from the start node
 2. Segment it into slices and take the first slice
 3. Take a SPIRAL_WINDOW (slice further) <br />
    Spiral windows for the 1st slice consist of 400 nodes, starting from the last
-   sorted node <br /> (the master_node for the 1st window)
+   sorted node <br /> (the start_node for the 1st window)
 4. Iteretively pop 15 nodes (a STRIDE), by the minimum cost. Namely, a
    SPIRAL_WINDOW is <br /> sliced to spiralsort a STRIDE of nodes, before moving
    to the next SPIRAL_WINDOW. <br />
-   (cost = |node - master_node| + |node - prev_node|) <br />
+   (cost = |node - start_node| + |node - prev_node|) <br />
    At each iterative step, a filter is applied, keeping only nodes from the
-   counterclockwise side <br /> of the vector that starts from the master node
+   counterclockwise side <br /> of the vector that starts from the start node
    and ends at the previous node, in order to <br /> force the algorithm to move
    on a constant rotating direction.
 5. Take the next SPIRAL_WINDOW and pop the next STRIDE. <br />
@@ -89,7 +89,7 @@ described by the <br /> following steps:
    This overlap of the slices ensures that there is a continuity while
    selecting the next nodes, <br /> when the algorithm reaches the last nodes of
    the slice.
-8. For the next slices, while moving away from the *master_node*, the
+8. For the next slices, while moving away from the *start_node*, the
    SPIRAL_WINDOW is <br /> selected differently. Specifically, before each
    STRIDE, the counterclockwise filter is applied, <br /> then the remaining
    nodes are cost-sorted (with respect to their cost) from the last <br />
@@ -115,7 +115,7 @@ described by the <br /> following steps:
 1. command line
 
 ```bash
-$ spiralsort <file_name> <master_node_id> --save-animation
+$ spiralsort <file_name> <start_node_id> --save-animation
 ```
 
 2. inside a python script

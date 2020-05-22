@@ -26,14 +26,14 @@ from spiralsort.core import spiralsort
 
 @click.command()
 @click.argument("file_path")
-@click.argument("master_node_id")
+@click.argument("start_node_id")
 @click.option("--output-format", "output_format", help="defaults to the"
               " format of the input file")
 @click.option("--save-animation/--no-save-animation", "save_animation",
               default=False, show_default=True, help="save an animation"
               " of the stepwise spiralsorting process")
 def main(file_path,
-         master_node_id,
+         start_node_id,
          save_animation=False,
          output_format=None):
 
@@ -43,7 +43,7 @@ def main(file_path,
     # when chained_assignment occurs, raise an error, in order to have
     # full control of the process
     with pd.option_context("mode.chained_assignment", "raise"):
-        sorted_nodes = spiralsort(nodes, master_node_id)
+        sorted_nodes = spiralsort(nodes, start_node_id)
 
     output_file = io.output_file_path(file_path, output_format)
     io.write_output(sorted_nodes, output_file)

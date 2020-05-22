@@ -130,13 +130,13 @@ def spiral_sort_frame(current_node_idx,
         plt.close()
 
 
-def plot_spiralsort(nodes_sorted, master_node_id, output_dir):
+def plot_spiralsort(nodes_sorted, start_node_id, output_dir):
     """saves an image for each step of the spiralsorting algorithm"""
     nodes_sorted.reset_index(drop=True, inplace=True)
-    master_node = \
-        nodes_sorted.loc[nodes_sorted["node_id"] == master_node_id].squeeze()
-    nodes_sorted["|node - master|"] = \
-        core.distances_from_node(nodes_sorted, master_node)
+    start_node = \
+        nodes_sorted.loc[nodes_sorted["node_id"] == start_node_id].squeeze()
+    nodes_sorted["|node - start|"] = \
+        core.distances_from_node(nodes_sorted, start_node)
 
     SPIRAL_WINDOW = config.SPIRAL_WINDOW
     STRIDE = config.STRIDE
@@ -147,7 +147,7 @@ def plot_spiralsort(nodes_sorted, master_node_id, output_dir):
     # ]
     slices = utils.create_slices(nodes_sorted)
 
-    # nodes are distance-sorted from the master_node, but the indexes
+    # nodes are distance-sorted from the start_node, but the indexes
     # are not sorted
     nodes_raw = core.cost_sort(nodes_sorted.copy(),
                                nodes_sorted.iloc[0],
@@ -345,7 +345,7 @@ def save_animation(nodes_sorted,
 
     Args:
         nodes_sorted (df)       :  the spiralsorted point-cloud
-        master_node_id (str)    :  the node_id of the node where
+        start_node_id (str)    :  the node_id of the node where
                                    spiralsorting started
         input_file_path (str)   :  path/to/input/file
         animation_speed (float) :  the decimal ratio of the default
@@ -354,11 +354,11 @@ def save_animation(nodes_sorted,
     """
     output_dir = os.path.join(os.getcwd(), "spiral_sort_visualization/")
 
-    # master_node is the 1st node
-    master_node_id = nodes_sorted.iloc[0, 0]
+    # start_node is the 1st node
+    start_node_id = nodes_sorted.iloc[0, 0]
 
     # save the frames at output_dir
-    plot_spiralsort(nodes_sorted, master_node_id, output_dir)
+    plot_spiralsort(nodes_sorted, start_node_id, output_dir)
 
     # save the video at the input_file_path dir
     ffmpeg_write_animation(input_file_path, output_dir, animation_speed)
