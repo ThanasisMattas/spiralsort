@@ -21,7 +21,7 @@ import pandas as pd
 from spiralsort import utils
 
 
-def start_offset(nodes, start_node_id):
+def _start_offset(nodes, start_node_id):
     """offsets all nodes, so that start_node becomes the origin"""
     nodes = nodes.copy()
     start_index = nodes.loc[nodes.node_id == start_node_id].index[0]
@@ -32,9 +32,9 @@ def start_offset(nodes, start_node_id):
 
 
 @njit(cache=True, nogil=True)
-def distances_from_node_numpy(nodes_x, nodes_y, nodes_z,
-                              node_x, node_y, node_z):
-    """numpy version of distances_from_node for numba optinization"""
+def _distances_from_node_numpy(nodes_x, nodes_y, nodes_z,
+                               node_x, node_y, node_z):
+    """numpy version of _distances_from_node for numba optinization"""
     distances = np.sqrt(
         (nodes_x - node_x) ** 2
         + (nodes_y - node_y) ** 2
@@ -43,7 +43,7 @@ def distances_from_node_numpy(nodes_x, nodes_y, nodes_z,
     return distances
 
 
-def distances_from_node(nodes, node):
+def _distances_from_node(nodes, node):
     """evaluates the distances (norm L2) of nodes from node
 
     Args:
@@ -53,13 +53,13 @@ def distances_from_node(nodes, node):
     Returns:
         distances (array)
     """
-    distances = distances_from_node_numpy(
+    distances = _distances_from_node_numpy(
         nodes.x.values, nodes.y.values, nodes.z.values,
         node.x, node.y, node.z)
     return distances
 
 
-def prev_node_xy_gradient(prev_node):
+def _prev_node_xy_gradient(prev_node):
     """returns the angle of the prev_node vector from the 0x axis
 
     **Deprecated**
@@ -88,21 +88,21 @@ def prev_node_xy_gradient(prev_node):
 
 
 @njit(cache=True, nogil=True)
-def prev_node_xy_gradient_numpy(prev_node_x, prev_node_y):
+def _prev_node_xy_gradient_numpy(prev_node_x, prev_node_y):
     """returns the angle of the prev_node vector from the 0x axis"""
     theta = np.angle(prev_node_x + prev_node_y * 1j)
     return theta
 
 
 @njit(cache=True, nogil=True)
-def z_rotation_numpy(theta, nodes_x, nodes_y):
-    """numpy implementation of z_rotation for numba optimization"""
+def _z_rotation_numpy(theta, nodes_x, nodes_y):
+    """numpy implementation of _z_rotation for numba optimization"""
     rotated_x = np.cos(theta) * nodes_x + np.sin(theta) * nodes_y
     rotated_y = - np.sin(theta) * nodes_x + np.cos(theta) * nodes_y
     return rotated_x, rotated_y
 
 
-def z_rotation(nodes, prev_node):
+def _z_rotation(nodes, prev_node):
     """2D rotation on z axis (linear transformation), such as prev_node
     will fall on the 0x axis
 
@@ -121,16 +121,16 @@ def z_rotation(nodes, prev_node):
     Returns:
         rotated (df)   :  the point-cloud after the rotation
     """
-    # theta = prev_node_xy_gradient(prev_node)
-    theta = prev_node_xy_gradient_numpy(prev_node.x, prev_node.y)
+    # theta = _prev_node_xy_gradient(prev_node)
+    theta = _prev_node_xy_gradient_numpy(prev_node.x, prev_node.y)
     rotated = nodes.copy()
-    rotated.x, rotated.y = z_rotation_numpy(
+    rotated.x, rotated.y = _z_rotation_numpy(
         theta, nodes.x.values, nodes.y.values
     )
     return rotated
 
 
-def counterclockwise_filter(nodes, prev_node):
+def _counterclockwise_filter(nodes, prev_node):
     """keeps only nodes from the counterclockwise side of the vector
     that starts at the start_node and ends at prev_node
 
@@ -146,7 +146,7 @@ def counterclockwise_filter(nodes, prev_node):
     Returns:
         (index)        :  the indexes of the filtered nodes
     """
-    nodes_rotated = z_rotation(nodes, prev_node)
+    nodes_rotated = _z_rotation(nodes, prev_node)
     nodes_filtered_index = nodes_rotated[nodes_rotated.y > 0].index
 
     # don't counterclockwise filter if prev_node is the start_node
@@ -157,7 +157,7 @@ def counterclockwise_filter(nodes, prev_node):
         return nodes.index
 
 
-def cost(nodes, prev_node):
+def _cost(nodes, prev_node):
     """cost = |node - start| + |node - prev_node|
 
     Args:
@@ -167,13 +167,13 @@ def cost(nodes, prev_node):
     Returns:
         cost_ (series)     : the cost column, to be inserted to the df
     """
-    cost_ = nodes["|node - start|"].add(
-        distances_from_node(nodes, prev_node)
+    cost = nodes["|node - start|"].add(
+        _distances_from_node(nodes, prev_node)
     )
-    return cost_
+    return cost
 
 
-def cost_sort(nodes, prev_node, ignore_index=True):
+def _cost_sort(nodes, prev_node, ignore_index=True):
     """sorts the nodes by cost from prev_node
 
     cost = |node - start| + |node - prev_node|
@@ -188,13 +188,13 @@ def cost_sort(nodes, prev_node, ignore_index=True):
         nodes (df)          : the point-cloud, cost-sorted
     """
     with pd.option_context("mode.chained_assignment", None):
-        nodes.loc[:, "cost"] = cost(nodes, prev_node)
+        nodes.loc[:, "cost"] = _cost(nodes, prev_node)
         nodes.sort_values("cost", inplace=True, kind="mergesort",
                           na_position="first", ignore_index=ignore_index)
     return nodes
 
 
-def pop_next_node(nodes, prev_node):
+def _pop_next_node(nodes, prev_node):
     """nodewise step of the algorithm
 
     1. evaluate cost
@@ -210,10 +210,10 @@ def pop_next_node(nodes, prev_node):
         next_node_id (str)  : to be appended to the node_ids list
         next_node (series)  : the currently popped node
     """
-    nodes_filtered = nodes.loc[counterclockwise_filter(nodes, prev_node)]
+    nodes_filtered = nodes.loc[_counterclockwise_filter(nodes, prev_node)]
 
     # 1. evaluate cost
-    nodes_filtered.loc[:, "cost"] = cost(nodes_filtered, prev_node)
+    nodes_filtered.loc[:, "cost"] = _cost(nodes_filtered, prev_node)
 
     # 2. pop the next_node
     next_node_idx = nodes_filtered["cost"].idxmin()
@@ -223,11 +223,11 @@ def pop_next_node(nodes, prev_node):
     return nodes, next_node_id, next_node
 
 
-def spiral_stride(nodes,
-                  node_ids,
-                  prev_node,
-                  spiral_window,
-                  stride):
+def _spiral_stride(nodes,
+                   node_ids,
+                   prev_node,
+                   spiral_window,
+                   stride):
     """moves one stride inside the spiral_window, iteretively popping
     nodes with respect to the min cost
 
@@ -257,14 +257,14 @@ def spiral_stride(nodes,
     if len(node_ids) <= 1000:
         nodes_filtered = nodes[slice(0, spiral_window)]
     else:
-        nodes_filtered = nodes.loc[counterclockwise_filter(nodes, prev_node)]
-        nodes_filtered = cost_sort(nodes, prev_node)
+        nodes_filtered = nodes.loc[_counterclockwise_filter(nodes, prev_node)]
+        nodes_filtered = _cost_sort(nodes, prev_node)
         nodes_filtered = nodes_filtered[slice(0, spiral_window)]
 
     iters = min(stride, len(nodes_filtered.index))
 
     for _ in range(iters):
-        nodes_filtered, prev_node_id, prev_node = pop_next_node(
+        nodes_filtered, prev_node_id, prev_node = _pop_next_node(
             nodes_filtered,
             prev_node
         )
@@ -332,7 +332,7 @@ def spiralsort(nodes_input, start_node_id):
     node_ids = [start_node_id]
 
     # make start_node the origin of the axes
-    nodes = start_offset(nodes_input, start_node_id)
+    nodes = _start_offset(nodes_input, start_node_id)
 
     # initialize previous node with the start node (series)
     start_node = nodes.loc[nodes["node_id"] == start_node_id]
@@ -342,7 +342,7 @@ def spiralsort(nodes_input, start_node_id):
     nodes.drop(start_node.index, inplace=True)
 
     # distance of all nodes from the start node
-    nodes["|node - start|"] = distances_from_node(nodes, prev_node)
+    nodes["|node - start|"] = _distances_from_node(nodes, prev_node)
 
     # distance-sort from start_node
     nodes.sort_values("|node - start|", inplace=True, kind="mergesort",
@@ -387,7 +387,7 @@ def spiralsort(nodes_input, start_node_id):
             strides = - (-len(remaining_nodes.index) // STRIDE)
 
         for _ in range(strides):
-            remaining_nodes, node_ids, prev_node = spiral_stride(
+            remaining_nodes, node_ids, prev_node = _spiral_stride(
                 remaining_nodes,
                 node_ids,
                 prev_node,

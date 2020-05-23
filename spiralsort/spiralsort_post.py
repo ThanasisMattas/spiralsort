@@ -31,21 +31,21 @@ def quick_scatter(x, y, z):
     plt.show()
 
 
-def spiral_sort_frame(current_node_idx,
-                      current_node_id,
-                      next_node,
-                      stride_nodes,
-                      counterclock_filtered,
-                      spiral_slice,
-                      nodes_rest,
-                      nodes_next_slices,
-                      stride,
-                      spiral_window,
-                      effective_slice,
-                      half_slice,
-                      num_nodes_next_slices,
-                      output_dir,
-                      show=False):
+def _spiral_sort_frame(current_node_idx,
+                       current_node_id,
+                       next_node,
+                       stride_nodes,
+                       counterclock_filtered,
+                       spiral_slice,
+                       nodes_rest,
+                       nodes_next_slices,
+                       stride,
+                       spiral_window,
+                       effective_slice,
+                       half_slice,
+                       num_nodes_next_slices,
+                       output_dir,
+                       show=False):
     """plot a frame, as a 3D scatter, of the spiral-sort algorithm"""
     fig = plt.figure()
     sub = fig.add_subplot(111, projection="3d")
@@ -130,13 +130,13 @@ def spiral_sort_frame(current_node_idx,
         plt.close()
 
 
-def plot_spiralsort(nodes_sorted, start_node_id, output_dir):
+def _plot_spiralsort(nodes_sorted, start_node_id, output_dir):
     """saves an image for each step of the spiralsorting algorithm"""
     nodes_sorted.reset_index(drop=True, inplace=True)
     start_node = \
         nodes_sorted.loc[nodes_sorted["node_id"] == start_node_id].squeeze()
     nodes_sorted["|node - start|"] = \
-        core.distances_from_node(nodes_sorted, start_node)
+        core._distances_from_node(nodes_sorted, start_node)
 
     SPIRAL_WINDOW = config.SPIRAL_WINDOW
     STRIDE = config.STRIDE
@@ -149,9 +149,9 @@ def plot_spiralsort(nodes_sorted, start_node_id, output_dir):
 
     # nodes are distance-sorted from the start_node, but the indexes
     # are not sorted
-    nodes_raw = core.cost_sort(nodes_sorted.copy(),
-                               nodes_sorted.iloc[0],
-                               ignore_index=False)
+    nodes_raw = core._cost_sort(nodes_sorted.copy(),
+                                nodes_sorted.iloc[0],
+                                ignore_index=False)
 
     # - nodes_sorted will  be used for iterating through the next
     #   nodes and saving the prev_node (perfect division with STRIDE)
@@ -252,12 +252,12 @@ def plot_spiralsort(nodes_sorted, start_node_id, output_dir):
 
                 # full_spiral_slice
                 counterclock_filtered = remaining_nodes.loc[
-                    core.counterclockwise_filter(
+                    core._counterclockwise_filter(
                         remaining_nodes,
                         nodes_sorted.loc[stride_node_idx]
                     )
                 ]
-                cost_sorted = core.cost_sort(
+                cost_sorted = core._cost_sort(
                     counterclock_filtered,
                     nodes_sorted.loc[stride_node_idx]
                 )
@@ -281,7 +281,7 @@ def plot_spiralsort(nodes_sorted, start_node_id, output_dir):
 
             # counterclock_filtered
             counterclock_filtered = full_spiral_slice.loc[
-                core.counterclockwise_filter(
+                core._counterclockwise_filter(
                     full_spiral_slice,
                     nodes_sorted.loc[i]
                 )
@@ -305,25 +305,25 @@ def plot_spiralsort(nodes_sorted, start_node_id, output_dir):
             # 2. counterclock_filtered
             # 3. spiral_slice
             # 4. nodes_rest (rest to remaining_nodes)
-            spiral_sort_frame(current_node_idx=i,
-                              current_node_id=current_node_id,
-                              next_node=nodes_sorted.iloc[i],
-                              stride_nodes=stride_nodes,
-                              counterclock_filtered=counterclock_filtered,
-                              spiral_slice=spiral_slice,
-                              nodes_rest=nodes_rest,
-                              nodes_next_slices=nodes_next_slices,
-                              stride=STRIDE,
-                              spiral_window=spiral_window,
-                              effective_slice=effective_slice,
-                              half_slice=half_slice,
-                              num_nodes_next_slices=num_nodes_next_slices,
-                              output_dir=output_dir,
-                              show=False)
+            _spiral_sort_frame(current_node_idx=i,
+                               current_node_id=current_node_id,
+                               next_node=nodes_sorted.iloc[i],
+                               stride_nodes=stride_nodes,
+                               counterclock_filtered=counterclock_filtered,
+                               spiral_slice=spiral_slice,
+                               nodes_rest=nodes_rest,
+                               nodes_next_slices=nodes_next_slices,
+                               stride=STRIDE,
+                               spiral_window=spiral_window,
+                               effective_slice=effective_slice,
+                               half_slice=half_slice,
+                               num_nodes_next_slices=num_nodes_next_slices,
+                               output_dir=output_dir,
+                               show=False)
             i += 1
 
 
-def ffmpeg_write_animation(input_file_path, output_dir, animation_speed):
+def _ffmpeg_write_animation(input_file_path, output_dir, animation_speed):
     """uses ffmpeg to write a timelapse from the images"""
     if (animation_speed < 0.1) | (animation_speed > 4.0):
         print("animation_speed out of limits. Setting it to 0.6 ...")
@@ -358,10 +358,10 @@ def save_animation(nodes_sorted,
     start_node_id = nodes_sorted.iloc[0, 0]
 
     # save the frames at output_dir
-    plot_spiralsort(nodes_sorted, start_node_id, output_dir)
+    _plot_spiralsort(nodes_sorted, start_node_id, output_dir)
 
     # save the video at the input_file_path dir
-    ffmpeg_write_animation(input_file_path, output_dir, animation_speed)
+    _ffmpeg_write_animation(input_file_path, output_dir, animation_speed)
 
     # cleanup the images
     shutil.rmtree(output_dir)
