@@ -319,7 +319,7 @@ def spiralsort(nodes_input, start_node_id):
 
     Args:
         nodes (df)           :  the point-cloud
-        start_node_id (str) :  the node where spiralsorting starts
+        start_node_id (str)  :  the node where spiralsorting starts
 
     Returns:
         nodes_sorted (df)    :  the spiralsorted point-cloud
