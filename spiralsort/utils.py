@@ -28,6 +28,7 @@ def check_duplicated_ids(nodes):
     if duplicated_ids:
         raise Exception("node_id column has duplicated entries: {}"
                         .format(duplicated_ids))
+    return True
 
 
 def point_cloud_mock():

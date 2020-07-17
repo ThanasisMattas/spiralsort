@@ -15,6 +15,7 @@ info:
 import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_index_equal
+import pytest
 
 from spiralsort import core, io, utils
 
@@ -46,8 +47,9 @@ def test_spiralsort():
     node_id = ["N_" + (max_digits - len(str(idx))) * '0' + str(idx)
                for idx in spiralsorted_expected.index]
     spiralsorted_expected.insert(0, "node_id", node_id)
-    spiralsorted_expected = \
-        spiralsorted_expected.astype({'x': "float", 'y': "float", 'z': "float"})
+    spiralsorted_expected = spiralsorted_expected.astype(
+        {'x': "float", 'y': "float", 'z': "float"}
+    )
 
     # format
     # ---------------------------
@@ -74,7 +76,8 @@ def test_spiralsort():
                            .reset_index(drop=True)
     spiralsorted = core.spiralsort(nodes_mock,
                                    spiralsorted_expected.loc[0, "node_id"])
-    assert_frame_equal(spiralsorted_expected, spiralsorted.iloc[:, [0, 1, 2, 3]])
+    assert_frame_equal(spiralsorted_expected,
+                       spiralsorted.iloc[:, [0, 1, 2, 3]])
 
 
 # =============================================================================
@@ -96,3 +99,13 @@ def test_animation_name():
 
 # =============================================================================
 # utils.py tests
+def test_duplicated_ids():
+    nodes_mock_passing = pd.DataFrame({"node_id": ["N_00", "N_01", "N_02"]})
+    nodes_mock_failling = pd.DataFrame({"node_id": ["N_00", "N_01", "N_00"]})
+    with pytest.raises(Exception) as excifno:
+        utils.check_duplicated_ids(nodes_mock_failling)
+    assert utils.check_duplicated_ids(nodes_mock_passing) is True
+
+def test_calc_half_slice():
+    assert utils.calc_half_slice(slice(1, 6)) == 2
+    assert utils.calc_half_slice(slice(1, 7)) == 3
