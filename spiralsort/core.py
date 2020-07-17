@@ -147,7 +147,7 @@ def _counterclockwise_filter(nodes, prev_node):
         (index)        :  the indexes of the filtered nodes
     """
     nodes_rotated = _z_rotation(nodes, prev_node)
-    nodes_filtered_index = nodes_rotated[nodes_rotated.y > 0].index
+    nodes_filtered_index = nodes_rotated[nodes_rotated.y >= 0].index
 
     # don't counterclockwise filter if prev_node is the start_node
     # or no nodes are left after the filter
