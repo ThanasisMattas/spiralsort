@@ -76,9 +76,23 @@ def test_spiralsort():
                                    spiralsorted_expected.loc[0, "node_id"])
     assert_frame_equal(spiralsorted_expected, spiralsorted.iloc[:, [0, 1, 2, 3]])
 
-    # start_node = pd.Series({'x': 0, 'y': 0, 'z': 0})
-    # nodes_mock["|node - start|"] = \
-    #     core._distances_from_node(nodes_mock, prev_node_mock)
 
-1# io.py tests
+# =============================================================================
+# io.py tests
+def test_output_file_path():
+    input_file_path_mock = "path/to/file.csv"
+    output_file_path_expected = "path/to/file_spiralsorted.csv"
+    output_file_path_expected_xlsx = "path/to/file_spiralsorted.xlsx"
+    assert output_file_path_expected == \
+        io.output_file_path(input_file_path_mock)
+    assert output_file_path_expected_xlsx == \
+        io.output_file_path(input_file_path_mock, output_format="xlsx")
 
+def test_animation_name():
+    input_file_path_mock = "path/to/file.csv"
+    ani_name = "path/to/file.mp4"
+    assert ani_name == io.animation_name(input_file_path_mock)
+
+
+# =============================================================================
+# utils.py tests
