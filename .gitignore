@@ -40,3 +40,4 @@
 **/*.egg
 **/extras/*
 **/spiral_sort_visualization/*
+.hidden
