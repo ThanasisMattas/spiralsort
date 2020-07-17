@@ -9,7 +9,7 @@ A point-cloud spiral-sorting algorithm
 | python3             | pillow>=7.0.0         | GNU/Linux |
 | click>=7.0          | matplotlib>=3.1.3     | Windows   |
 | numba>=0.48.0       | ffmpeg>=4.1.4         |           |
-| numpy>=1.18.0       |                       |           |
+| numpy>=1.18.0       | pytest>=5.4.2         |           |
 | pandas>=1.0.1       |                       |           |
 
 ## How to use
