@@ -1,0 +1,3 @@
+ignore:
+    - "spiralsort/__main__.py"
+    - "spiralsort/spiralsort_post.py"
