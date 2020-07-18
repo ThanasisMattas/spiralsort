@@ -42,3 +42,4 @@
 **/spiral_sort_visualization/*
 .hidden
 **/.coverage
+**/coverage.xml
