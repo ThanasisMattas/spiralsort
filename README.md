@@ -1,8 +1,20 @@
 # SpiralSort
 
+[![PyPI version](https://badge.fury.io/py/spiralsort.svg)](https://badge.fury.io/py/spiralsort)
+[![Build Status](https://travis-ci.com/ThanasisMattas/spiralsort.svg?branch=master)](https://travis-ci.com/ThanasisMattas/spiralsort)
+[![codecov](https://codecov.io/gh/ThanasisMattas/spiralsort/branch/master/graph/badge.svg)](https://codecov.io/gh/ThanasisMattas/spiralsort)
+<br />
+<!--
+[![GitHub license](https://img.shields.io/github/license/ThanasisMattas/spiralsort)](https://github.com/ThanasisMattas/spiralsort/blob/master/COPYING)
+[![Python](https://img.shields.io/pypi/pyversions/spiralsort.svg?style=plastic)](https://badge.fury.io/py/spiralsort)
+-->
+
 A point-cloud spiral-sorting algorithm
+<br />
 
 <img src="bin/spiralsort_2D.gif" width="400" height="248" /> <img src="bin/spiralsort_3D.gif" width="400" height="248" />
+
+<br />
 
 | requirements        | optional              | os        |
 | ------------------- | --------------------- | --------- |
@@ -12,6 +24,8 @@ A point-cloud spiral-sorting algorithm
 | numpy>=1.18.0       | pytest>=5.4.2         |           |
 | pandas>=1.0.1       |                       |           |
 
+<br />
+
 ## How to use
 
 1. command line
@@ -20,7 +34,7 @@ A point-cloud spiral-sorting algorithm
 $ spiralsort <file_name> <start_node_id>
 ```
 
-2. inside a python script
+1. inside a python script
 
 ```python
 from spiralsort.core import spiralsort
@@ -28,7 +42,7 @@ from spiralsort.core import spiralsort
 point_cloud_sorted = spiralsort(point_cloud, start_node_id)
 ```
 
-3. docker container
+1. docker container
 
 Insert input_file and take the output, using a shared volume between the
 host and the container.
@@ -74,7 +88,7 @@ described by the <br /> following steps:
 3. Take a SPIRAL_WINDOW (slice further) <br />
    Spiral windows for the 1st slice consist of 400 nodes, starting from the last
    sorted node <br /> (the start_node for the 1st window)
-4. Iteretively pop 15 nodes (a STRIDE), by the minimum cost. Namely, a
+1. Iteretively pop 15 nodes (a STRIDE), by the minimum cost. Namely, a
    SPIRAL_WINDOW is <br /> sliced to spiralsort a STRIDE of nodes, before moving
    to the next SPIRAL_WINDOW. <br />
    (cost = |node - start_node| + |node - prev_node|) <br />
@@ -82,23 +96,23 @@ described by the <br /> following steps:
    counterclockwise side <br /> of the vector that starts from the start node
    and ends at the previous node, in order to <br /> force the algorithm to move
    on a constant rotating direction.
-5. Take the next SPIRAL_WINDOW and pop the next STRIDE. <br />
-6. Continue until the remainder of the nodes reaches the size of the
+2. Take the next SPIRAL_WINDOW and pop the next STRIDE. <br />
+3. Continue until the remainder of the nodes reaches the size of the
    half slice (1000 nodes for <br /> the 1st slice).
-7. Merge the remaining nodes with the next slice <br />
+4. Merge the remaining nodes with the next slice <br />
    This overlap of the slices ensures that there is a continuity while
    selecting the next nodes, <br /> when the algorithm reaches the last nodes of
    the slice.
-8. For the next slices, while moving away from the *start_node*, the
+5. For the next slices, while moving away from the *start_node*, the
    SPIRAL_WINDOW is <br /> selected differently. Specifically, before each
    STRIDE, the counterclockwise filter is applied, <br /> then the remaining
    nodes are cost-sorted (with respect to their cost) from the last <br />
    spiralsorted node and, finally, a SPIRAL_WINDOW is sliced, to start the
    iterative spiralsorting <br /> of the nodes in the next STRIDE.
-9. Keep moving by SPIRAL_WINDOWs, counterclockwise
+6. Keep moving by SPIRAL_WINDOWs, counterclockwise
    filtering at each stride, popping <br /> STRIDEs of nodes until the half
    slice thresshold.
-10. Upon reaching the last slice, remove the *half_slice* threshold, to
+7.  Upon reaching the last slice, remove the *half_slice* threshold, to
    pop all the remaining nodes.
 
 ## Options
@@ -118,7 +132,7 @@ described by the <br /> following steps:
 $ spiralsort <file_name> <start_node_id> --save-animation
 ```
 
-2. inside a python script
+1. inside a python script
 
 ```python
 from spiralsort.spiralsort_post import save_animation
