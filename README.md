@@ -12,7 +12,7 @@
 A point-cloud spiral-sorting algorithm
 <br />
 
-<img src="bin/spiralsort_2D.gif" width="400" height="248" /> <img src="bin/spiralsort_3D.gif" width="400" height="248" />
+<img src="https://raw.githubusercontent.com/ThanasisMattas/spiralsort/master/bin/spiralsort_2D.gif" width="400" height="248" /> <img src="https://raw.githubusercontent.com/ThanasisMattas/spiralsort/master/bin/spiralsort_3D.gif" width="400" height="248" />
 
 <br />
 
