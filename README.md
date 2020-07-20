@@ -32,7 +32,7 @@ A point-cloud spiral-sorting algorithm
 $ spiralsort <file_name> <start_node_id>
 ```
 
-1. inside a python script
+2. inside a python script
 
 ```python
 from spiralsort.core import spiralsort
@@ -40,10 +40,11 @@ from spiralsort.core import spiralsort
 point_cloud_sorted = spiralsort(point_cloud, start_node_id)
 ```
 
-1. docker container
+3. docker container &nbsp; ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/thanasismatt/spiralsort?style=plastic)
 
 Insert input_file and take the output, using a shared volume between the
 host and the container.
+
 
 ```
 $ docker pull thanasismatt/spiralsort:latest
