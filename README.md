@@ -40,7 +40,7 @@ from spiralsort.core import spiralsort
 point_cloud_sorted = spiralsort(point_cloud, start_node_id)
 ```
 
-3. docker container &nbsp; ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/thanasismatt/spiralsort?style=plastic)
+1. docker container &nbsp; ![Docker Cloud Build Status]
 
 Insert input_file and take the output, using a shared volume between the
 host and the container.
@@ -143,3 +143,7 @@ save_animation(point_cloud_sorted, path_to_input_file)
 
 > (C) 2020, Thanasis Mattas <br />
 > atmattas@physics.auth.gr
+
+[//]: # "links"
+
+[Docker Cloud Build Status]: <https://img.shields.io/docker/cloud/build/thanasismatt/spiralsort?style=plastic>
