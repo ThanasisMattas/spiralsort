@@ -25,17 +25,18 @@ from spiralsort.core import spiralsort
 
 
 @click.command()
-@click.argument("file_path")
+@click.argument("file_path", type=click.Path())
 @click.argument("start_node_id")
-@click.option("--output-format", "output_format", help="defaults to the"
+@click.option("--output-format", "output_format", type=click.STRING,
+              default=None, show_default=True, help="defaults to the"
               " format of the input file")
 @click.option("--save-animation/--no-save-animation", "save_animation",
               default=False, show_default=True, help="save an animation"
               " of the stepwise spiralsorting process")
 def main(file_path,
          start_node_id,
-         save_animation=False,
-         output_format=None):
+         output_format,
+         save_animation):
 
     start = timer()
     nodes = io.read_data_file(file_path)
