@@ -99,7 +99,7 @@ def calc_half_slice(slicing_obj):
     return half_slice
 
 
-def delete_images(directory):
+def delete_images(directory):  # pragma: no cover
     """deletes all images in a given directory (for debugging)"""
     files_list = [f for f in os.listdir(directory)]
     for f in files_list:
