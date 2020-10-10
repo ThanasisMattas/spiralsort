@@ -1,18 +1,17 @@
+# SpiralSort is free software; you may redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version. You should have received a copy of the GNU
+# General Public License along with this program. If not, see
+# <https://www.gnu.org/licenses/>.
+# ======================================================================
 """
 info:
-    file        :  core.py
-    author      :  Thanasis Mattas
-    license     :  GNU General Public License v3
-    description :  Usually, does some spiralsorting stuff
-
-SpiralSort is free software; you may redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation, either version 3 of the License, or (at your
-option) any later version. You should have received a copy of the GNU
-General Public License along with this program. If not, see
-<https://www.gnu.org/licenses/>.
+    file        : core.py
+    author      : Thanasis Mattas
+    license     : GNU General Public License v3
+    description : Usually does some spiralsorting stuff
 """
-
 
 import numpy as np
 from numba import njit
@@ -59,7 +58,7 @@ def _distances_from_node(nodes, node):
     return distances
 
 
-def _prev_node_xy_gradient(prev_node):
+def _prev_node_xy_gradient(prev_node):  # pragma: no cover
     """returns the angle of the prev_node vector from the 0x axis
 
     **Deprecated**
