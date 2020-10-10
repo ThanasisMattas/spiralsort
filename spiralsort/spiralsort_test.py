@@ -124,3 +124,10 @@ class TestUtils:
     def test_calc_half_slice(self):
         assert utils.calc_half_slice(slice(1, 6)) == 2
         assert utils.calc_half_slice(slice(1, 7)) == 3
+
+    def test_point_cloud_mock(self):
+        dataset, start_node_id = utils.point_cloud_mock()
+        assert isinstance(dataset, pd.DataFrame)
+        assert isinstance(start_node_id, str)
+        columns_expected = np.array(["node_id", 'x', 'y', 'z'])
+        np.array_equal(dataset.columns, columns_expected)
