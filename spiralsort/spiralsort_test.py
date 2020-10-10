@@ -13,6 +13,8 @@ info:
     description : Houses all the tests (fail is not an option)
 """
 
+import os
+
 import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_index_equal
@@ -39,9 +41,9 @@ def test_spiralsort():
     spiralsorted_expected = pd.DataFrame(
         {
             #     0, 1, 2, 3, 4, 5,  6,  7,  8,  9, 10, 11, 12, 13, 14,15,16,17,18,19  20, 21, 22,23,24,25
-            'x': [0, 1, 2, 2, 1, 0, -1, -2, -2, -2, -1,  0,  1,  2,  3, 3, 3, 2, 1, 0, -2, -2,  3, 3, 2, 3],
-            'y': [0, 0, 0, 1, 2, 2,  2,  1,  0, -1, -2, -2, -2, -2, -1, 0, 1, 2, 3, 3,  2, -2, -2, 2, 3, 3],
-            'z': [0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0, 0, 0,  0,  0,  0, 0, 0, 0]
+            'x': [0, 1, 2, 2, 1, 0, -1, -2, -2, -2, -1,  0,  1,  2,  3, 3, 3, 2, 1, 0, -2, -2,  3, 3, 2, 3],  # noqa: E241
+            'y': [0, 0, 0, 1, 2, 2,  2,  1,  0, -1, -2, -2, -2, -2, -1, 0, 1, 2, 3, 3,  2, -2, -2, 2, 3, 3],  # noqa: E241
+            'z': [0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0, 0, 0,  0,  0,  0, 0, 0, 0]   # noqa: E241
         }
     )
     max_digits = len(str(spiralsorted_expected.index.max()))
@@ -96,6 +98,14 @@ def test_animation_name():
     input_file_path_mock = "path/to/file.csv"
     ani_name = "path/to/file.mp4"
     assert ani_name == io.animation_name(input_file_path_mock)
+
+def test_read_data_file():
+    data_path = os.path.join("examples", "data_examples",
+                             "point_cloud_example.csv")
+    dataset = io.read_data_file(data_path)
+    assert isinstance(dataset, pd.DataFrame)
+    columns_expected = np.array(["node_id", 'x', 'y', 'z'])
+    np.array_equal(dataset.columns, columns_expected)
 
 
 # =============================================================================
