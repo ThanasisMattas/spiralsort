@@ -4,14 +4,15 @@
 # option) any later version. You should have received a copy of the GNU
 # General Public License along with this program. If not, see
 # <https://www.gnu.org/licenses/>.
+# ======================================================================
 """
 info:
-    file        :  spiralsort_test.py
-    author      :  Thanasis Mattas
-    license     :  GNU General Public License v3
-    description :  Houses all the tests (fail is not an option)
-
+    file        : spiralsort_test.py
+    Copyright   : 2020 Athanasios Mattas
+    license     : GNU General Public License v3
+    description : Houses all the tests (fail is not an option)
 """
+
 import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_index_equal

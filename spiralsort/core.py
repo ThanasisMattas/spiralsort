@@ -8,7 +8,7 @@
 """
 info:
     file        : core.py
-    author      : Thanasis Mattas
+    Copyright   : 2020 Athanasios Mattas
     license     : GNU General Public License v3
     description : Usually does some spiralsorting stuff
 """
