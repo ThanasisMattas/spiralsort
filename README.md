@@ -40,7 +40,7 @@ from spiralsort.core import spiralsort
 point_cloud_sorted = spiralsort(point_cloud, start_node_id)
 ```
 
-1. docker container &nbsp; ![Docker Cloud Build Status]
+3. docker container &nbsp; ![Docker Cloud Build Status]
 
 Insert input_file and take the output, using a shared volume between the
 host and the container.
@@ -56,6 +56,10 @@ root@<container_id>:/# spiralsort <container_dir>/<file_name> <start_node_id>
 
 ```bash
 $ pip install spiralsort
+```
+
+```bash
+$ conda install -c mattasa spiralsort
 ```
 
 ## Input/Output file (or DataFrame) format
