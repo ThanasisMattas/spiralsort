@@ -1,17 +1,15 @@
+# spiralsort_test.py is part of SpiralSort
+#
 # SpiralSort is free software; you may redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
 # Free Software Foundation, either version 3 of the License, or (at your
 # option) any later version. You should have received a copy of the GNU
 # General Public License along with this program. If not, see
 # <https://www.gnu.org/licenses/>.
+#
+# (C) 2020 Athanasios Mattas
 # ======================================================================
-"""
-info:
-    file        : spiralsort_test.py
-    Copyright   : 2020 Athanasios Mattas
-    license     : GNU General Public License v3
-    description : Houses all the tests (fail is not an option)
-"""
+"""Houses all the tests."""
 
 import os
 

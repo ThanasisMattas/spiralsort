@@ -1,17 +1,15 @@
+# config.py is part of SpiralSort
+#
 # SpiralSort is free software; you may redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
 # Free Software Foundation, either version 3 of the License, or (at your
 # option) any later version. You should have received a copy of the GNU
 # General Public License along with this program. If not, see
 # <https://www.gnu.org/licenses/>.
+#
+# (C) 2020 Athanasios Mattas
 # ======================================================================
-"""
-info:
-    file        : confg.py
-    Copyright   : 2020 Athanasios Mattas
-    license     : GNU General Public License v3
-    description : Provides some constants for the algorithm
-"""
+"""Houses some global variables."""
 
 # used at slicing the point-cloud
 BASE = 2000
