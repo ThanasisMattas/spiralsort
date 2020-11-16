@@ -1,6 +1,6 @@
 # SpiralSort
 
-[![PyPI version](https://badge.fury.io/py/spiralsort.svg)](https://badge.fury.io/py/spiralsort)
+![PyPI](https://img.shields.io/pypi/v/spiralsort?color=success)
 [![Build Status](https://travis-ci.com/ThanasisMattas/spiralsort.svg?branch=master)](https://travis-ci.com/ThanasisMattas/spiralsort)
 [![codecov](https://codecov.io/gh/ThanasisMattas/spiralsort/branch/master/graph/badge.svg)](https://codecov.io/gh/ThanasisMattas/spiralsort)
 <br />
