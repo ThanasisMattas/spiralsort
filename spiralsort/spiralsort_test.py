@@ -17,8 +17,10 @@ import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_index_equal
 import pytest
+import time
 
 from spiralsort import core, io, utils
+from spiralsort.utils import time_this
 
 
 class TestCore:
@@ -131,3 +133,20 @@ class TestUtils:
         assert isinstance(start_node_id, str)
         columns_expected = np.array(["node_id", 'x', 'y', 'z'])
         np.array_equal(dataset.columns, columns_expected)
+
+    def test_print_duration(self, capsys):
+        utils.print_duration(10, 1500, "check")
+        captured = capsys.readouterr()
+        expected_out = "Check duration----------------0:24:50\n"
+        assert captured.out == expected_out
+
+    def test_time_this(self, capsys):
+
+        @time_this
+        def sleep_for(secs: float):
+            time.sleep(secs)
+
+        sleep_for(0.1)
+        captured = capsys.readouterr()
+        expected_out = "Sleep_for duration------------0:00:00.10\n"
+        assert captured.out == expected_out
