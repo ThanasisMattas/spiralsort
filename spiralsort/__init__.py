@@ -13,7 +13,7 @@
 
 
 __name__ = 'spiralsort'
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 __author__ = 'Athanasios Mattas'
 __author_email__ = 'thanasismatt@gmail.com'
 __description__ = 'A point-cloud spiral-sorting algorithm'
