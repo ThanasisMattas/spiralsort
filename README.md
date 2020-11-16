@@ -1,14 +1,8 @@
 # SpiralSort
 
-![PyPI](https://img.shields.io/pypi/v/spiralsort?color=success)
-[![Build Status](https://travis-ci.com/ThanasisMattas/spiralsort.svg?branch=master)](https://travis-ci.com/ThanasisMattas/spiralsort)
-[![codecov](https://codecov.io/gh/ThanasisMattas/spiralsort/branch/master/graph/badge.svg)](https://codecov.io/gh/ThanasisMattas/spiralsort)
-<br />
-<!--
-[![GitHub license](https://img.shields.io/github/license/ThanasisMattas/spiralsort)](https://github.com/ThanasisMattas/spiralsort/blob/master/COPYING)
-[![Python](https://img.shields.io/pypi/pyversions/spiralsort.svg?style=plastic)](https://badge.fury.io/py/spiralsort)
--->
+![PyPI] ![Build_Status] ![codecov]
 
+<br />
 A point-cloud spiral-sorting algorithm
 <br />
 
@@ -24,7 +18,25 @@ A point-cloud spiral-sorting algorithm
 | numpy>=1.18.0       | pytest>=5.4.2         |           |
 | pandas>=1.0.1       |                       |           |
 
-## How to use
+<br />
+
+## Install
+
+```bash
+$ pip install spiralsort
+```
+
+```bash
+$ conda install -c mattasa spiralsort
+```
+
+## Test
+
+```bash
+$ pytest spiralsort
+```
+
+## Usage
 
 1. command line
 
@@ -52,19 +64,15 @@ $ docker run -it --rm -v ${PWD}:<container_dir> thanasismatt/spiralsort bin/bash
 root@<container_id>:/# spiralsort <container_dir>/<file_name> <start_node_id>
 ```
 
-## How to install
+## Options
 
-```bash
-$ pip install spiralsort
-```
+**--output-format=<format** **>** <br />
+(suported: csv, json, xlsx; defaults to the format of the input
+                 file) <br />
+**--save-animation/--no-save-animation** <br />
+(defaults to false)
 
-```bash
-$ conda install -c mattasa spiralsort
-```
-
-## Input/Output file (or DataFrame) format
-
-supported formats: csv, json
+## Input/Output format
 
 | node_id |   x   |   y   |   z   |
 | ------- | ----- | ----- | ----- |
@@ -72,10 +80,11 @@ supported formats: csv, json
 | N001    |  1.28 |  2.64 | 13.04 |
 | ...
 
+- File (csv, json) or DataFrame
 - node_ids have to be unique
 - In case of 2D data, just use a constant value for the 3rd dimension.
 
-## How it works
+## Under the hood
 
 Starting from the *start_node* the algorithm evaluates a cost for each node and
 moves to the <br /> node with the minimum cost (cost for node<sup>i+1</sup> is
@@ -118,16 +127,7 @@ described by the <br /> following steps:
 7.  Upon reaching the last slice, remove the *half_slice* threshold, to
    pop all the remaining nodes.
 
-## Options
-
-**--output-format=<format** **>** <br />
-(suported: csv, json, xlsx; defaults to the format of the input
-                 file) <br />
-**--save-animation/--no-save-animation** <br />
-(defaults to false)
-
-## How to create an animation of the process
-
+## Animate the process
 
 1. command line
 
@@ -143,6 +143,9 @@ from spiralsort.spiralsort_post import animate
 animate(point_cloud_sorted, path_to_input_file)
 ```
 
+## License
+[GNU General Public License v3.0]
+
 <br />
 
 > (C) 2020, Athanasios Mattas <br />
@@ -151,3 +154,7 @@ animate(point_cloud_sorted, path_to_input_file)
 [//]: # "links"
 
 [Docker Cloud Build Status]: <https://img.shields.io/docker/cloud/build/thanasismatt/spiralsort?style=plastic>
+[PyPI]: <https://img.shields.io/pypi/v/spiralsort?color=success>
+[Build_Status]: <https://travis-ci.com/ThanasisMattas/spiralsort.svg?branch=master>
+[codecov]: <https://codecov.io/gh/ThanasisMattas/spiralsort/branch/master/graph/badge.svg>
+[GNU General Public License v3.0]: <https://github.com/ThanasisMattas/spiralsort/blob/master/COPYING>
