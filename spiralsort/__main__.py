@@ -15,7 +15,7 @@ import click
 import pandas as pd
 
 from spiralsort import io
-from spiralsort.core import spiralsort
+from spiralsort.core import spiralsorted
 from spiralsort.utils import time_this
 
 
@@ -38,7 +38,7 @@ def main(file_path,
     # When chained_assignment occurs, raise an error, in order to have
     # full control of the process.
     with pd.option_context("mode.chained_assignment", "raise"):
-        sorted_nodes = spiralsort(nodes, start_node_id)
+        sorted_nodes = spiralsorted(nodes, start_node_id)
 
     output_file = io.output_file_path(file_path, output_format)
     io.write_output(sorted_nodes, output_file)

@@ -337,12 +337,12 @@ def _ffmpeg_write_animation(input_file_path, output_dir, animation_speed):
 def animate(nodes_sorted,
             input_file_path,
             animation_speed=0.6):
-    """saves an animation, where each frame is a step of the spiralsort
-    algorithm, with detais about the slices that it is working on
+    """Saves an animation, where each frame is a step of the spiralsort
+    algorithm, with detais about the slices that it is working on.
 
     Args:
         nodes_sorted (df)       :  the spiralsorted point-cloud
-        start_node_id (str)    :  the node_id of the node where
+        start_node_id (str)     :  the node_id of the node where
                                    spiralsorting started
         input_file_path (str)   :  path/to/input/file
         animation_speed (float) :  the decimal ratio of the default

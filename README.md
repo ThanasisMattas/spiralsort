@@ -35,9 +35,9 @@ $ spiralsort <file_name> <start_node_id>
 2. inside a python script
 
 ```python
-from spiralsort.core import spiralsort
+from spiralsort.core import spiralsorted
 
-point_cloud_sorted = spiralsort(point_cloud, start_node_id)
+point_cloud_spiralsorted = spiralsorted(point_cloud, start_node_id)
 ```
 
 3. docker container &nbsp; ![Docker Cloud Build Status]

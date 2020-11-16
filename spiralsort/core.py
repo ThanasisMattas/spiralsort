@@ -278,8 +278,8 @@ def _spiral_stride(nodes,
 
 
 @time_this
-def spiralsort(nodes_input, start_node_id):
-    """spiralsorts the point-cloud, starting from the start_node
+def spiralsorted(nodes_input, start_node_id):
+    """SpiralSorts the point-cloud, starting from the start_node.
 
     The SpiralSort algorithm:
     1. Sort the point cloud with respect to the distance from the start

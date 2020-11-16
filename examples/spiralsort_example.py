@@ -1,7 +1,7 @@
 import os
 
 from spiralsort import io, spiralsort_post
-from spiralsort.core import spiralsort
+from spiralsort.core import spiralsorted
 
 
 def main():
@@ -15,7 +15,7 @@ def main():
     start_node_id = "N_4004"
 
     # spiralsort
-    sorted_nodes = spiralsort(nodes, start_node_id)
+    sorted_nodes = spiralsorted(nodes, start_node_id)
 
     # write output
     output_file = io.output_file_path(input_file)

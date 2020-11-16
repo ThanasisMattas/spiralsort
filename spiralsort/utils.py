@@ -113,8 +113,8 @@ def print_duration(start, end, process):
     """prints the duration of a process"""
     process_name = {
         "main": "Total",
-        "spiralsort": "SpiralSort",
-        "save_animation": "Post-processing"
+        "spiralsorted": "SpiralSort",
+        "animate": "Post-processing"
     }
     if process in process_name:
         prefix = f"{process_name[process]} duration"

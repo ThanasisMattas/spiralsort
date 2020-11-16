@@ -37,7 +37,7 @@ class TestCore:
                                                        prev_node_mock)
         assert_index_equal(index_expected, index_filtered)
 
-    def test_spiralsort(self):
+    def test_spiralsorted(self):
         spiralsorted_expected = pd.DataFrame(
             {
                 #     0, 1, 2, 3, 4, 5,  6,  7,  8,  9, 10, 11, 12, 13, 14,15,16,17,18,19  20, 21, 22,23,24,25
@@ -77,10 +77,12 @@ class TestCore:
         # shuffle the DataFrame
         nodes_mock = nodes_mock.sample(frac=1, random_state=9) \
                                .reset_index(drop=True)
-        spiralsorted = core.spiralsort(nodes_mock,
-                                       spiralsorted_expected.loc[0, "node_id"])
+        spiralsorted_result = core.spiralsorted(
+            nodes_input=nodes_mock,
+            start_node_id=spiralsorted_expected.loc[0, "node_id"]
+        )
         assert_frame_equal(spiralsorted_expected,
-                           spiralsorted.iloc[:, [0, 1, 2, 3]])
+                           spiralsorted_result.iloc[:, [0, 1, 2, 3]])
 
 
 class TestIo:
