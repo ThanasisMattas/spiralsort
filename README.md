@@ -145,8 +145,8 @@ save_animation(point_cloud_sorted, path_to_input_file)
 
 <br />
 
-> (C) 2020, Thanasis Mattas <br />
-> atmattas@physics.auth.gr
+> (C) 2020, Athanasios Mattas <br />
+> thanasismatt@gmail.com
 
 [//]: # "links"
 

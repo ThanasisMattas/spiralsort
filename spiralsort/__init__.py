@@ -15,7 +15,7 @@
 __name__ = 'spiralsort'
 __version__ = '0.2.1'
 __author__ = 'Athanasios Mattas'
-__author_email__ = 'atmattas@physics.auth.gr'
+__author_email__ = 'thanasismatt@gmail.com'
 __description__ = 'A point-cloud spiral-sorting algorithm'
 __url__ = 'https://github.com/ThanasisMattas/spiralsort.git'
 __license__ = 'GNU General Public License v3'
