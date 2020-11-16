@@ -13,14 +13,12 @@ info:
     description : Main script that calls all necessary processes
 """
 
-from datetime import timedelta
-from timeit import default_timer as timer
-
 import click
 import pandas as pd
 
 from spiralsort import io
 from spiralsort.core import spiralsort
+from spiralsort.utils import time_this
 
 
 @click.command()
@@ -32,24 +30,20 @@ from spiralsort.core import spiralsort
 @click.option("--save-animation/--no-save-animation", "save_animation",
               default=False, show_default=True, help="save an animation"
               " of the stepwise spiralsorting process")
+@time_this
 def main(file_path,
          start_node_id,
          output_format,
          save_animation):
-
-    start = timer()
     nodes = io.read_data_file(file_path)
 
-    # when chained_assignment occurs, raise an error, in order to have
-    # full control of the process
+    # When chained_assignment occurs, raise an error, in order to have
+    # full control of the process.
     with pd.option_context("mode.chained_assignment", "raise"):
         sorted_nodes = spiralsort(nodes, start_node_id)
 
     output_file = io.output_file_path(file_path, output_format)
     io.write_output(sorted_nodes, output_file)
-
-    ss_duration = str(timedelta(seconds=timer() - start))
-    click.echo("SpiralSorting completed. Duration: " + ss_duration)
 
     if save_animation:
         try:

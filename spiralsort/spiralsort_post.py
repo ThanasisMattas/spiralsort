@@ -16,11 +16,10 @@ info:
 import os
 import shutil
 
-import matplotlib.animation as animation
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 from spiralsort import config, core, io, utils
+from spiralsort.utils import time_this
 
 
 def quick_scatter(x, y, z):
@@ -336,6 +335,7 @@ def _ffmpeg_write_animation(input_file_path, output_dir, animation_speed):
     os.system(command)
 
 
+@time_this
 def save_animation(nodes_sorted,
                    input_file_path,
                    animation_speed=0.6):

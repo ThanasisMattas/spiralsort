@@ -13,8 +13,12 @@ info:
     description : Houses some helper functions
 """
 
+from datetime import timedelta
+from functools import wraps
 import os
+from timeit import default_timer as timer
 
+import click
 import numpy as np
 import pandas as pd
 
@@ -105,3 +109,43 @@ def delete_images(directory):  # pragma: no cover
     for f in files_list:
         if f.endswith(".png") or f.endswith(".jpg"):
             os.remove(os.path.join(directory, f))
+
+
+def print_duration(start, end, process):
+    """prints the duration of a process"""
+    process_name = {
+        "main": "Total",
+        "spiralsort": "SpiralSort",
+        "save_animation": "Post-processing"
+    }
+    if process in process_name:
+        prefix = f"{process_name[process]} duration"
+    else:
+        prefix = f"{process.capitalize()} duration"
+    duration = timedelta(seconds=end - start)
+    click.echo(f"{prefix:-<30}{duration}"[:40])
+
+
+def time_this(f):
+    """function timer decorator
+
+    - Uses wraps to preserve the metadata of the decorated function
+      (__name__ and __doc__)
+    - prints the duration
+
+    Args:
+        f(funtion)      : the function to be decorated
+
+    Returns:
+        wrap (callable) : returns the result of the decorated function
+    """
+    assert callable(f)
+
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        start = timer()
+        result = f(*args, **kwargs)
+        end = timer()
+        print_duration(start, end, f.__name__)
+        return result
+    return wrap

@@ -18,6 +18,7 @@ from numba import njit
 import pandas as pd
 
 from spiralsort import utils
+from spiralsort.utils import time_this
 
 
 def _start_offset(nodes, start_node_id):
@@ -278,6 +279,7 @@ def _spiral_stride(nodes,
     return nodes, node_ids, prev_node
 
 
+@time_this
 def spiralsort(nodes_input, start_node_id):
     """spiralsorts the point-cloud, starting from the start_node
 
