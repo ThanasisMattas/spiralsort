@@ -9,9 +9,8 @@ REQUIRED = ['click>=7.0',
             'pandas>=1.0.1']
 
 EXTRAS = {
-    'plot each step': ['pillow>=7.0.0', 'matplotlib>=3.1.3'],
-    'write video': ['ffmpeg'],
-    'testing': ['pytest>=5.4.2']
+    'animation': ['ffmpeg>=4.2.4', 'matplotlib>=3.1.3', 'pillow>=7.0.0'],
+    'test': ['pytest>=5.4.2']
 }
 
 here = os.path.abspath(os.path.dirname(__file__))
