@@ -334,9 +334,9 @@ def _ffmpeg_write_animation(input_file_path, output_dir, animation_speed):
 
 
 @time_this
-def save_animation(nodes_sorted,
-                   input_file_path,
-                   animation_speed=0.6):
+def animate(nodes_sorted,
+            input_file_path,
+            animation_speed=0.6):
     """saves an animation, where each frame is a step of the spiralsort
     algorithm, with detais about the slices that it is working on
 

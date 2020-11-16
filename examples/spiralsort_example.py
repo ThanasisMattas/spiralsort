@@ -22,7 +22,7 @@ def main():
     io.write_output(sorted_nodes, output_file)
 
     # save an animation, visualizing how the SpiralSort works
-    spiralsort_post.save_animation(sorted_nodes, input_file)
+    spiralsort_post.animate(sorted_nodes, input_file)
 
 if __name__ == '__main__':
     main()

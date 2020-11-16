@@ -47,7 +47,7 @@ def main(file_path,
         try:
             from spiralsort import spiralsort_post
             click.echo("Creating the animation. This will take a while...")
-            spiralsort_post.save_animation(sorted_nodes, file_path)
+            spiralsort_post.animate(sorted_nodes, file_path)
         except ModuleNotFoundError:
             raise Exception("Check if matplotlib and ffmpeg are installed."
                             " Exiting...")

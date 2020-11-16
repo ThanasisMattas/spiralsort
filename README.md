@@ -135,12 +135,12 @@ described by the <br /> following steps:
 $ spiralsort <file_name> <start_node_id> --save-animation
 ```
 
-1. inside a python script
+2. inside a python script
 
 ```python
-from spiralsort.spiralsort_post import save_animation
+from spiralsort.spiralsort_post import animate
 
-save_animation(point_cloud_sorted, path_to_input_file)
+animate(point_cloud_sorted, path_to_input_file)
 ```
 
 <br />
