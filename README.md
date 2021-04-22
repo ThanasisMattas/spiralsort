@@ -28,12 +28,6 @@ $ pip install spiralsort
 $ conda install -c mattasa spiralsort
 ```
 
-## Test
-
-```bash
-$ pytest spiralsort
-```
-
 ## Usage
 
 1. command line
@@ -64,11 +58,11 @@ root@<container_id>:/# spiralsort <container_dir>/<file_name> <start_node_id>
 
 ## Options
 
-**--output-format=<format** **>** <br />
-(suported: csv, json, xlsx; defaults to the format of the input
-                 file) <br />
-**--save-animation/--no-save-animation** <br />
-(defaults to false)
+**-f/--output-format=<format** **>** <br />
+(suported: csv, json, xlsx; defaults to the format of the input file) <br />
+**-a/--save-animation** <br />
+save an animation of the spiralsorting process (.mp4)
+
 
 ## Input/Output format
 
@@ -81,6 +75,12 @@ root@<container_id>:/# spiralsort <container_dir>/<file_name> <start_node_id>
 - File (csv, json) or DataFrame
 - node_ids have to be unique
 - In case of 2D data, just use a constant value for the 3rd dimension.
+
+## Test
+
+```bash
+$ pytest spiralsort
+```
 
 ## Under the hood
 

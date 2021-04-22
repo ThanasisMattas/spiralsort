@@ -14,23 +14,21 @@
 import click
 import pandas as pd
 
-from spiralsort import io
-import spiralsort
 from spiralsort.core import spiralsorted
+from spiralsort import io
 from spiralsort.utils import time_this
 
 
 @click.command()
 @click.argument("file_path", type=click.Path())
 @click.argument("start_node_id")
-@click.option("--output-format", "output_format", type=click.STRING,
-              default=None, show_default=True, help="defaults to the"
-              " format of the input file")
-@click.option("--save-animation/--no-save-animation", "save_animation",
-              default=False, show_default=True, help="save an animation"
-              " of the stepwise spiralsorting process")
-@click.version_option(version=spiralsort.__version__,
-                      prog_name=spiralsort.__name__,
+@click.option('-f', "--output-format", type=click.STRING,
+              default=None, show_default=True,
+              help="defaults to the format of the input file")
+@click.option('-a', "--save-animation", is_flag=True,
+              help="saves an animation of the stepwise spiralsorting process")
+@click.version_option(version=__import__('spiralsort').__version__,
+                      prog_name=__import__('spiralsort').__name__,
                       message='%(version)s')
 @time_this
 def main(file_path,
