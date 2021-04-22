@@ -18,8 +18,6 @@ A point-cloud spiral-sorting algorithm
 | numpy>=1.18.0       | pytest>=5.4.2         |           |
 | pandas>=1.0.1       |                       |           |
 
-<br />
-
 ## Install
 
 ```bash

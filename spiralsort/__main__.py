@@ -15,6 +15,7 @@ import click
 import pandas as pd
 
 from spiralsort import io
+import spiralsort
 from spiralsort.core import spiralsorted
 from spiralsort.utils import time_this
 
@@ -28,6 +29,9 @@ from spiralsort.utils import time_this
 @click.option("--save-animation/--no-save-animation", "save_animation",
               default=False, show_default=True, help="save an animation"
               " of the stepwise spiralsorting process")
+@click.version_option(version=spiralsort.__version__,
+                      prog_name=spiralsort.__name__,
+                      message='%(version)s')
 @time_this
 def main(file_path,
          start_node_id,
@@ -49,8 +53,7 @@ def main(file_path,
             click.echo("Creating the animation. This will take a while...")
             spiralsort_post.animate(sorted_nodes, file_path)
         except ModuleNotFoundError:
-            raise Exception("Check if matplotlib and ffmpeg are installed."
-                            " Exiting...")
+            raise Exception("Check if matplotlib and ffmpeg are installed.")
 
 if __name__ == "__main__":
     main()
