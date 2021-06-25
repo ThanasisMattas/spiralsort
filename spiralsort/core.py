@@ -11,8 +11,8 @@
 # ======================================================================
 """Usually does some spiralsorting stuff."""
 
+import numba as nb
 import numpy as np
-from numba import njit
 import pandas as pd
 
 from spiralsort import utils
@@ -28,8 +28,8 @@ def _start_offset(nodes, start_node_id):
     nodes.z = nodes.z - nodes.loc[start_index, "z"]
     return nodes
 
-
-@njit(cache=True, nogil=True)
+@nb.njit(nb.f4[:](nb.f4[:], nb.f4[:], nb.f4[:], nb.f4, nb.f4, nb.f4),
+         cache=True, nogil=True)
 def _distances_from_node_numpy(nodes_x, nodes_y, nodes_z,
                                node_x, node_y, node_z):
     """numpy version of _distances_from_node for numba optinization"""
@@ -85,19 +85,25 @@ def _prev_node_xy_gradient(prev_node):  # pragma: no cover
     return theta
 
 
-@njit(cache=True, nogil=True)
+@nb.njit(nb.f8(nb.f8, nb.f8), cache=True, nogil=True)
 def _prev_node_xy_gradient_numpy(prev_node_x, prev_node_y):
     """returns the angle of the prev_node vector from the 0x axis"""
     theta = np.angle(prev_node_x + prev_node_y * 1j)
     return theta
 
 
-@njit(cache=True, nogil=True)
-def _z_rotation_numpy(theta, nodes_x, nodes_y):
+@nb.njit(nb.f4[:](nb.f4, nb.f4[:], nb.f4[:]), cache=True, nogil=True)
+def _z_rotation_numpy_x(theta, nodes_x, nodes_y):
     """numpy implementation of _z_rotation for numba optimization"""
     rotated_x = np.cos(theta) * nodes_x + np.sin(theta) * nodes_y
+    return rotated_x
+
+
+@nb.njit(nb.f4[:](nb.f4, nb.f4[:], nb.f4[:]), cache=True, nogil=True)
+def _z_rotation_numpy_y(theta, nodes_x, nodes_y):
+    """numpy implementation of _z_rotation for numba optimization"""
     rotated_y = - np.sin(theta) * nodes_x + np.cos(theta) * nodes_y
-    return rotated_x, rotated_y
+    return rotated_y
 
 
 def _z_rotation(nodes, prev_node):
@@ -119,12 +125,10 @@ def _z_rotation(nodes, prev_node):
     Returns:
         rotated (df)   :  the point-cloud after the rotation
     """
-    # theta = _prev_node_xy_gradient(prev_node)
     theta = _prev_node_xy_gradient_numpy(prev_node.x, prev_node.y)
     rotated = nodes.copy()
-    rotated.x, rotated.y = _z_rotation_numpy(
-        theta, nodes.x.values, nodes.y.values
-    )
+    rotated.x = _z_rotation_numpy_x(theta, nodes.x.values, nodes.y.values)
+    rotated.y = _z_rotation_numpy_y(theta, nodes.x.values, nodes.y.values)
     return rotated
 
 
