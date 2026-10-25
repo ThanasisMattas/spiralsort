@@ -1,4 +1,4 @@
-certifi==2024.7.4
+certifi==2026.10.19
 click==7.1.2
 llvmlite==0.33.0
 numba==0.50.1
